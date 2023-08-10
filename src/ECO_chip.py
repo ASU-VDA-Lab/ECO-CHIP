@@ -13,10 +13,10 @@ import json
 import ast
 
 
-#DEBUG = False #TODO Remove this and its internals
-DEBUG = True #TODO Remove this and its internals
-MAIN = False #TODO This will go into our git repo, remove DEBUG and internals before checkin
-#MAIN = True #TODO This will go into our git repo, remove DEBUG and internals before checkin
+DEBUG = False #TODO Remove this and its internals
+#DEBUG = True #TODO Remove this and its internals
+#MAIN = False #TODO This will go into our git repo, remove DEBUG and internals before checkin
+MAIN = True #TODO This will go into our git repo, remove DEBUG and internals before checkin
 
 
 scaling_factors = load_tables()
