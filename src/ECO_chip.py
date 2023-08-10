@@ -52,7 +52,11 @@ if DEBUG:
     test = [12,12,12,12,]
     print(np.sum(test))        
     print(np.prod(recursive_split(test)[0]))
-    
+   
+    print("power chip")
+    power_val = power_chip([7],['logic'],scaling_factors,15,365,[0.2,0.667,0.1])
+    print(power_val)
+
     print("beol")
     #print(scaling_factors['beolVfeol'].loc[:,0])
     tech = 14
@@ -97,11 +101,18 @@ if MAIN:
     print(design)
     print("done")   #TODO CCS remove
 
+    power = 15
+    powers = design.area.values * power / design.area.values.sum()
+
+    design.insert(loc=2,column='power',value=powers)
+    print(design)
+
     #result = calculate_CO2(design,scaling_factors, [10,14], 'Tiger Lake')
     result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
     print(result[0])
     print(result[1])
     print(result[2])
+    print(result[3])
 
 
     ##Working JSON
@@ -126,17 +137,36 @@ if DEBUG:
     print("carbon = ",len(carbon))
     print("carbon = ",carbon.shape)
     
-    for n,comb in enumerate(combinations):
-        print(comb)
-        for i,package in enumerate(packaging_techs):
-            print("i , package ",i,package)
-        carbon[n, 2*i], carbon[n, 2*i+1] = Interposer(areas=design.area.values, 
-                                                      techs=comb, 
-                                                      types = design.type.values, 
-                                                      scaling_factors = scaling_factors,
-                                                      interposer_type=package)
-    
-    
+    #for n,comb in enumerate(combinations):
+    #    print(comb)
+    #    for i,package in enumerate(packaging_techs):
+    #        print("i , package ",i,package)
+    #    carbon[n, 2*i], carbon[n, 2*i+1] = Interposer(areas=design.area.values, 
+    #                                                  techs=comb, 
+    #                                                  types = design.type.values, 
+    #                                                  scaling_factors = scaling_factors,
+    #                                                  interposer_type=package)
+
+    print("New Interposer")
+    interposer_techs = [7, 14, 22, 28, 65]
+    active_carbon = np.zeros((len(interposer_techs), 2))
+    areas = np.array(design['area']).astype(np.float64)
+    techs = np.array([7]*len(areas))
+    types = design['type']
+    for n, interposer_tech in enumerate(interposer_techs):
+        active_carbon[n,0], active_carbon[n,1], _ = Interposer(areas=areas,
+                                                 techs=techs,
+                                                 types = types,
+                                                 scaling_factors=scaling_factors,
+                                                 interposer_type='active',
+                                                 always_chiplets=True,
+                                                 interposer_node = interposer_tech
+                                                )
+    active_carbon = pd.DataFrame(data=active_carbon, index=interposer_techs, columns=['package', 'router'])
+    print("ACTIVE")
+    print(active_carbon)
+
+
     print("done with Interpose function")
     print(carbon)
     ##

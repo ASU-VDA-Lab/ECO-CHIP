@@ -10,21 +10,16 @@ def yield_calc(area, defect_density):
 
 ###############################################
 #TODO remove old commented codes
+#TODO where does the below 3 constants go?
 
-Trasistors_per_gate = 8 #TODO Where does these 3 lines go? 
+Trasistors_per_gate = 8 
 Power_per_core = 10
 Carbon_per_kWh = 700
 
 def design_costs(areas, comb,scaling_factors):
-    #transistors = areas * np.array([Transistors_per_mm2[x] for x in comb])
     transistors = areas * np.array([scaling_factors['transistors_per_mm2'].loc[x,'Transistors_per_mm2'] for x in comb])
-    #print("comb:",comb)
-    #print("transistors: ", transistors)
     gates = transistors/Trasistors_per_gate
-    #print(gates)
-    #CPU_core_hours = gates/np.array([Gates_per_hour_per_core[x] for x in comb])
     CPU_core_hours = gates/np.array([scaling_factors['gates_per_hr_per_core'].loc[x,'Gates_per_hr_per_core'] for x in comb])
-    #print(CPU_core_hours)
     total_energy = Power_per_core*CPU_core_hours/1000 #in kWh
     design_carbon = Carbon_per_kWh * total_energy
     return design_carbon
@@ -33,8 +28,8 @@ def design_costs(areas, comb,scaling_factors):
 ################################################
 #TODO : Remove unwanted prints and others
 
-#  1 interface every 10mm length
-def recursive_split(areas, axis=0):
+
+def recursive_split(areas, axis=0, emib_pitch=10):
     sorted_areas = np.sort(areas[::-1])
     if len(areas)<=1:
         v = (np.sum(areas)/2)**0.5
@@ -48,15 +43,15 @@ def recursive_split(areas, axis=0):
             blocks[np.argmin(sums)].append(area)
             sums[np.argmin(sums)] += area
 #         print("blocks",axis, blocks)
-        left, l_if = recursive_split(blocks[0], (axis+1)%2)
+        left, l_if = recursive_split(blocks[0], (axis+1)%2, emib_pitch)
 #         print("left",axis, left)
-        right, r_if = recursive_split(blocks[1], (axis+1)%2)
+        right, r_if = recursive_split(blocks[1], (axis+1)%2, emib_pitch)
 #         print("right",axis, right)
         sizes = np.array((0.0,0.0))
         sizes[axis] = left[axis] + right[axis] + 0.5
         sizes[(axis+1)%2] = np.max((left[(axis+1)%2], right[(axis+1)%2]))
         t_if = l_if + r_if 
-        t_if += np.ceil(np.min((left[(axis+1)%2], right[(axis+1)%2]))/10) # for overlap 1 interface per 10mm
+        t_if += np.ceil(np.min((left[(axis+1)%2], right[(axis+1)%2]))/emib_pitch) # for overlap 1 interface per 10mm
         return sizes, t_if
 
 
@@ -89,6 +84,22 @@ def Si_chip(techs, types, areas,scaling_factors,packaging=False, always_chiplets
     return carbon, design_carbon, area_scale
 
 ###############################################
+#TODO 
+
+def power_chip(techs, types, scaling_factors,powers, lifetime, activity):
+    active = activity[0]
+    on = activity[1]
+    avg_pwr = activity[2]
+    powers_in = np.array(powers)
+    dyn_ratio =  np.array([scaling_factors['dyn_pwr_ratio'].loc[c, 'dyn_pwr_ratio'] for c in techs])
+    pwr_scale = np.array([scaling_factors[ty].loc[techs[i], 'power'] for i, ty in enumerate(types)])
+    powers_tech_scaled = powers_in * pwr_scale
+    powers_scaled = powers_tech_scaled*on*avg_pwr*(dyn_ratio*active + (1-dyn_ratio))
+    energy = lifetime*powers_scaled/1000
+    op_carbon = Carbon_per_kWh * energy
+    return op_carbon,powers_scaled 
+
+###############################################
 #TODO : Remove comments 
 #where to put the below constants  ? numBEOL ? RDLLayers? I think these are pkg parameters right ?
 
@@ -96,9 +107,14 @@ def Si_chip(techs, types, areas,scaling_factors,packaging=False, always_chiplets
 numBEOL = 8 # even carbon distribution in  old nodes #DTCO
 RDLLayers = 6 
 EMIBLayers = 5 
+tsv_pitch = 25e-6/1e-3 #pitch per mm
+tsv_size = 5e-6 / 1e-3
 
 
-def Interposer(areas, techs, types, scaling_factors,  interposer_type="passive", always_chiplets=False):
+def Interposer(areas, techs, types, scaling_factors, interposer_type="passive", always_chiplets=False,
+               interposer_node=65, tsv_pitch=tsv_pitch, tsv_size=tsv_size, emib_pitch=10,
+               return_router_area=False
+              ):
     #TBD 
     # passive interposer
     #1. Bonding yield  - 99% from "Cost-effective design of scalable high-performance systems using active and passive interposers"
@@ -110,40 +126,60 @@ def Interposer(areas, techs, types, scaling_factors,  interposer_type="passive",
     #7. packaging yield adjustments
     package_carbon = 0 
     router_carbon = 0 
+    router_design = 0
     bonding_yield = 0.99
+    router_area =0
     if(~np.all(np.array(techs) == techs[0]) or always_chiplets):
-        #print("hi")
         num_chiplets = len(areas)
-        #print("num_chiplets ",num_chiplets)
-        interposer_area, num_if = recursive_split(areas)
+        interposer_area, num_if = recursive_split(areas, emib_pitch=emib_pitch)
         num_if = np.int(np.ceil(num_if))
         interposer_area = np.prod(interposer_area) 
 #         print(interposer_area, np.sum(areas))
-        interposer_carbon, _, _ = Si_chip([65], ["logic"], [interposer_area],scaling_factors, True, always_chiplets)
+        interposer_carbon, _, _ = Si_chip([interposer_node], ["logic"], [interposer_area],scaling_factors, True, always_chiplets)
         if (interposer_type == "active"):
             router_area = 4.47 * num_chiplets
             router_carbon = interposer_carbon * router_area / interposer_area
+            _, router_design, _ = Si_chip([interposer_node], ["logic"], [router_area], scaling_factors ,True, always_chiplets)
+            router_design = np.sum(router_design)
+            #package_carbon = (interposer_carbon-router_carbon)* beolVfeol[65] 
             package_carbon = (interposer_carbon-router_carbon)* scaling_factors['beolVfeol'].loc[65,'beolVfeol'] 
-        else:
+        elif (interposer_type == "3D"):
+            dims = np.sqrt(np.array(areas, dtype=np.float64))
+            num_tsv_1d = np.floor(dims/tsv_pitch)
+            overhead_3d = (num_tsv_1d**2) * (tsv_size**2)
+            area_3d = areas + overhead_3d
+            carbon3d, _, _ = Si_chip(techs, types, area_3d,scaling_factors, False, always_chiplets)
+            carbon2d, _, _ = Si_chip(techs, types, areas,scaling_factors ,False, always_chiplets)
+            package_carbon = np.sum(carbon3d-carbon2d)
+            router_area = 0.33/np.array([scaling_factors[ty].loc[14, 'area'] for ty in types])
+            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors ,False)
+            router_carbon, router_design = np.sum(router_carbon), np.sum(router_design) 
+            bonding_yield = bonding_yield**num_chiplets
+        elif interposer_type in ['passive', 'RDL', 'EMIB'] :
 #             interposer_area = np.sum(areas)*1.1
             #0.33 in 16 convert to 7nm
             router_area = 0.33/np.array([scaling_factors[ty].loc[14, 'area'] for ty in types])
-            router_carbon, _, _ = Si_chip(techs, types, router_area, scaling_factors,False)
-            router_carbon = np.sum(router_carbon)
+            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors, False)
+            router_carbon, router_design = np.sum(router_carbon), np.sum(router_design)
             if interposer_type == 'passive':
-                package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[65,'beolVfeol']
+                package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[interposer_node,'beolVfeol']
             elif interposer_type == 'RDL':
-                package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[65,'beolVfeol']
+                package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[interposer_node,'beolVfeol']
                 package_carbon *= RDLLayers/numBEOL    
             elif (interposer_type == 'EMIB'):
                 emib_area =  [5*5]*num_if
 #                 print("NUMBER OF INTERFACES",num_if)
-                emib_carbon, _, _ = Si_chip([22]*num_if, ["logic"]*num_if, emib_area,scaling_factors, True)
-                package_carbon = np.sum(emib_carbon)*scaling_factors['beolVfeol'].loc[22,'beolVfeol'] 
-
+                emib_carbon, _, _ = Si_chip([22]*num_if, ["logic"]*num_if, emib_area, scaling_factors, True)
+                package_carbon = np.sum(emib_carbon)* scaling_factors['beolVfeol'].loc[22,'beolVfeol'] 
+        else:
+            raise NotImplemented
+            
     package_carbon /= bonding_yield 
     router_carbon /= bonding_yield 
-    return package_carbon, router_carbon
+    if return_router_area:
+        return package_carbon, router_carbon, router_design, router_area
+    else:
+        return package_carbon, router_carbon, router_design
 
 
 ###############################################
@@ -189,31 +225,67 @@ def package_CO2(design, scaling_factors, techs):
 #TODO : remove comments 
 #Do we need to add plots for this func? We could remove these lines  
 
-def calculate_CO2(design, scaling_factors, techs, design_name='', interposer_type='RDL', always_chiplets=False):
-    combinations=list(it.product(techs, repeat=len(design.index)))
-    design_carbon = np.zeros((len(combinations), len(design.index)+1))
-    carbon = np.zeros((len(combinations), len(design.index)+1))
 
+def calculate_CO2(design, scaling_factors, techs, design_name='', interposer_type='RDL', always_chiplets=False,
+                  lifetime = 2*365*24, activity=[0.2, 0.667, 0.1], Ns = 1e5, Nc=None, plot=False,package_factor=1,
+                  return_ap=False, in_combinations=None
+                 ):
+    num_iter = 90
+    if in_combinations is None:
+        combinations = list(it.product(techs, repeat=len(design.index)))
+    else:
+        combinations = in_combinations
+    design_carbon = np.zeros((len(combinations), len(design.index)+1))
+    op_carbon = np.zeros((len(combinations), len(design.index)+1))
+    carbon = np.zeros((len(combinations), len(design.index)+1))
+    
+    areas=  np.zeros((len(combinations), len(design.index)))
+    powers =  np.zeros((len(combinations), len(design.index)))
     for n, comb in enumerate(combinations):
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
-                                                                  areas=design.area.values, scaling_factors=scaling_factors, always_chiplets=always_chiplets )
-        carbon[n, -1] = np.sum(Interposer(areas=design.area.values*area_scale, techs=comb, types=design.type.values, scaling_factors=scaling_factors,
-                                          interposer_type=interposer_type, always_chiplets=always_chiplets))
+                                                                  areas=design.area.values,scaling_factors=scaling_factors, always_chiplets=always_chiplets )
+        package_c, router_c, design_carbon[n,-1], router_a =Interposer(areas=design.area.values*area_scale, techs=comb, types=design.type.values,scaling_factors=scaling_factors,
+                                          interposer_type=interposer_type, always_chiplets=always_chiplets, return_router_area=True)
+        carbon[n, -1] = package_c*package_factor + router_c
+        
+        op_carbon[n,:-1], powers[n, :] = power_chip(comb, design.type.values,scaling_factors, design.power.values, lifetime, activity)
+        areas[n] =  design.area.values*area_scale +router_a
+    if Nc is None:
+        design_carbon *= num_iter/Ns
+        total_carbon = carbon + design_carbon + op_carbon
+    else:
+        design_carbon *= num_iter/Nc[None,:]
+        total_carbon = carbon + design_carbon + op_carbon
     carbon = pd.DataFrame(data=carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
-    carbon.plot(kind='bar', stacked=True, figsize = (21,7),
-        title=f'Stacked CO2 manufacturing: {design_name}')
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    
     design_carbon = pd.DataFrame(data=design_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
-    design_carbon.plot(kind='bar', stacked=True, figsize = (21,7),
-        title=f'Stacked CO2 design: {design_name}')
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
+    op_carbon = pd.DataFrame(data=op_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
+    #     total_carbon =  carbon + (design_carbon*10/1e5)+ 0.8*(design_carbon*100/1e5)
+    total_carbon = pd.DataFrame(data=total_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
+    
+        
+    if plot:
+        carbon.plot(kind='bar', stacked=True, figsize = (21,7),
+            title=f'Stacked CO2 manufacturing: {design_name}')
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
 
-    total_carbon =  carbon + (design_carbon*10/1e5)+ 0.8*(design_carbon*100/1e5)
-    total_carbon.plot(kind='bar', stacked=True, figsize = (10,7),
-        title=f'Total C02 manufacturing+design: {design_name}')
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    return carbon, design_carbon, total_carbon
+        design_carbon.plot(kind='bar', stacked=True, figsize = (21,7),
+            title=f'Stacked CO2 design: {design_name}')
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+
+        op_carbon.plot(kind='bar', stacked=True, figsize = (21,7),
+            title=f'Stacked CO2 operations: {design_name}')
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+    
+        total_carbon.plot(kind='bar', stacked=True, figsize = (10,7),
+            title=f'Total C02 manufacturing+design: {design_name}')
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+    
+    if not return_ap:
+        return carbon, design_carbon, total_carbon, op_carbon
+    else:
+        return carbon, design_carbon, total_carbon, op_carbon, areas, powers
+    
