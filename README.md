@@ -13,25 +13,26 @@ Carbon footprint estimator for heterogenous chiplet-based systems. Integration w
 # FAQs
 
 
-#File Structure
-├── config
-│   ├── design.json
-│   └── node_list.txt
-├── README.md
-├── src
-│   ├── CO2_func.py
-│   ├── ECO_chip.py
-│   └── tech_scaling.py
-└── tech_params
-    ├── analog_scaling.json
-    ├── beol_feol_scaling.json
-    ├── cpa_scaling.json
-    ├── defect_density.json
-    ├── dyn_pwr_scaling.json
-    ├── gates_perhr_scaling.json
-    ├── logic_scaling.json
-    ├── sram_scaling.json
-    └── transistors_scaling.json
+# File Structure
+
+> ├── config
+> │   ├── design.json
+> │   └── node_list.txt
+> ├── README.md
+> ├── src
+> │   ├── CO2_func.py
+> │   ├── ECO_chip.py
+> │   └── tech_scaling.py
+> └── tech_params
+>     ├── analog_scaling.json
+>     ├── beol_feol_scaling.json
+>     ├── cpa_scaling.json
+>     ├── defect_density.json
+>     ├── dyn_pwr_scaling.json
+>     ├── gates_perhr_scaling.json
+>     ├── logic_scaling.json
+>     ├── sram_scaling.json
+>     └── transistors_scaling.json
 
 # Requirments 
 
