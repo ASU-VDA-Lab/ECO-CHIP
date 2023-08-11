@@ -1,25 +1,21 @@
 # ECO-CHIP
 
-Carbon footprint estimator for heterogenous chiplet-based systems. Integration with cost estimation and NoC modeling.
-ECO-CHIP Chiplet based Carbon Foot Print (CFP) analysis tool to harness the potential of heterogeneous integration (HI). Tool estimates complete total CFP [design, manufacturing, operational and packaging]. The tool considers
-complex HI packaging architectures. Supports following HI and packaging architectures : RDL fanout, Silicon bridge-based, passive and active interposer, and 3D-integration. The tool evaluates the crucial package/assembly carbon
-emissions which are essential for HI systems, taking into consideration size, yeild and assembly process. Tool is also capable of computing design CFP, ie. the carbon cost for designing the chip. 
-
-
-The architectures description is taken from config/design.json. 
-Technology nodes for chiplets is taken from config/node_list.txt 
-Scaling parameters used for exploring CFP across differnt nodes and combinations are defined under tech_params/* 
-
-
-# Table of Contents
-
--   File Structure 
--   Requirments 
--   Commands 
+Carbon footprint estimator for heterogenous chiplet-based systems. 
+ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (design, manufacturing, and packaging). The tool supports the following HI and packaging architectures: RDL fanout, silicon bridge-based, passive and active interposer, and 3D integration. The tool evaluates the crucial package/assembly carbon
+emissions essential for HI systems, considering size, yield, and assembly process. In addition, it also estimates design CFP.  
 
 
 
-# File Structure
+## Table of Contents
+
+-   File structure 
+-   Getting started
+-   Config and input definition
+-   Running ECO-CHIP
+-   Outputs
+
+
+## File structure
 
 > ├── config
 > │   ├── design.json
@@ -40,72 +36,79 @@ Scaling parameters used for exploring CFP across differnt nodes and combinations
 >     ├── sram_scaling.json
 >     └── transistors_scaling.json
 
-# Config
 
-> design.json
+## Getting started
 
-Add the design that is needed to explore chiplet based CFP analysis in config/design.json file. This file currently supports three design types : "logic", "analog" and "sram". Each of these types have thier dependent scaling factors,parameters under tech_params/* directory. To determine the embodied CFP for just one type the design.json can be modified with the desired type along with its respective area. The current desing.json file shows an example for a design with 3 chiplets : logic, analog and memory. The corresponding area of the chiplet needs to be given in the format as shows in design.json under the LOGIC/ANALOG/Memory component. Current desing.json example shows a case for 3 chiplets, this can be extended to any number of chiplets. Below is an example : 
+### Prerequisites
 
->				example/design.json 
->					{
->						Logic
->						Analog 
->						Memory
->					{
-				
->				example/ex_4chiplet.json 
->					{
->						logic 
->						logic 
->						analog 
->						memory
->					}
+ECO-CHIP requires the following:
+```
+- python 3.6
+- pip 18.1
+- python3-venv
+```
+Additionally, please refer to the requirements.txt file in this repository. The packages in requirements.txt will be installed in a virtual environment.
 
-> node_list.txt
-This file accepts the specifeid nodes required for exploring various chiplet combinations, generating CFP for each possible combinations based on the chiplets numbers and nodes of intereset. 
-The current node_list.txt file contains [7,10,14] producing all feasible combinations for 7nm, 10nm and 14nm, based on the specified number of chiplets. 
+### Download and install with bash
+
+```
+git clone <path>
+cd ECO-CHIP
+python3 -m venv eco-chip
+source eco-chip/bin/activate
+pip3 install -r requirements.txt
+```
+
+## Input definition and config
+
+ECO-CHIP has three inputs, including a design configuration file, a list of supported technology nodes, and technology/scaling parameter files which are all described below: 
+
+### Design configuration
+
+The input system architecture is specified in [design.json!](config/design.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. The area of each chiplet is also specified, as shown below.  
+
+```
+{
+"chiplet1" : {
+          "type" : "logic",
+          "area" : 16.04
+        },
+"chiplet2" : {
+          "type" : "analog",
+          "area" : 24.47
+        },
+"chiplet3" : {
+          "type" : "sram",
+          "area" : 10.84
+       }
+}
+```
+The above file can be extended to support any number of chiplets by adding more entries to the JSON file. 
+
+### Technology node list
+
+The [node_list.txt!](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. 
 
 
-# src
+### Technology/scaling parameters 
 
-> tech_scaling 
-			This file calls in all the parameters needed from tech_param/* directory for CFP analysis
-
-> CO2_function 
-			Contains all the functions needed for CFP analysis.
-
-> ECO_chip
-			Main file that takes in the desing.json, node_list.txt as input and runs the desing. 
+The [tech params directory!](./tech_params/.) holds the scaling factors along with other additional parameters such as CPA, defect density, area scaling, and dynamic_power scaling values  needed for computing CFP for a given chiplet type. 
+Analog, logic, and memory exhibit varying scaling rates [10][22]. Incorporating the transistor density scaling trends from [28][29] allows us to address distinct scaling factors for different design types. By factoring in scaling trends in analog, memory and logic, ECO-CHIP computes CFP.
 
 
-# tech_params 
+## Running ECO-CHIP
 
-The tech param directors holds the scaling factors along with other additional parameters such as CPA, defect density, area scaling, and dynamic_power scaling values that are needed for computing CFP for a given chiplet type. 
-From [3] it is very clear that older tech nodes have lower CFP compared to newer tech due to better yeild and defect density, we account for this in defect_density.json file.
-Analog,logic and memory exhibit varying scaling rates [10][22]. Incorporating the transistor desnity scaling trends from [28][29] allows us to address distinct scaling factors for differnt deisng types. By factoring in scaling trends in analog, memory and logic, we obtain a comprehensice and accurate perspective for CFP analysis.
-
-# To run ECO-CHIP
-
->   Requirments to input to the code
-
-        Area(mm2) and type for each chiplet 
-        #total power of the chip
-        
->    Steps
-
-```sh
-git clone <MODULE PATH>
-cd ECO-CHIP 
-```    
-
-Modify config/desing.json to the required design with area for each type (logic,analog and memory).
-Modify config/nodes.txt to the desired nodes for with CFP needs to be explored across. 
+Modify config/desing.json to the required design with an area for each type (logic, analog and memory). Modify config/nodes.txt to the desired nodes for which CFP needs to be explored across. 
     
-Command for CFP exploration across nodes : 
+The command for CFP exploration across nodes : 
 
 ```sh
 python3 src/ECO_chip.py --design config/desing.json 
 ```
 
-# Requirments 
+## Outputs
+
+
+
+
 
