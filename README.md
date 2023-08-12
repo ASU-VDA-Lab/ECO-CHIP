@@ -17,25 +17,24 @@ emissions essential for HI systems, considering size, yield, and assembly proces
 
 ## File structure
 
-> ├── config
-> │   ├── design.json
-> │   └── node_list.txt
-> ├── README.md
-> ├── src
-> │   ├── CO2_func.py
-> │   ├── ECO_chip.py
-> │   └── tech_scaling.py
-> └── tech_params
->     ├── analog_scaling.json
->     ├── beol_feol_scaling.json
->     ├── cpa_scaling.json
->     ├── defect_density.json
->     ├── dyn_pwr_scaling.json
->     ├── gates_perhr_scaling.json
->     ├── logic_scaling.json
->     ├── sram_scaling.json
->     └── transistors_scaling.json
-
+- **config/**
+  - [design.json](./config/design.json)
+  - [node_list.txt](./config/node_list.txt)
+- [README.md](./README.md)
+- **src/**
+  - [CO2_func.py](./src/CO2_func.py)
+  - [ECO_chip.py](./src/ECO_chip.py)
+  - [tech_scaling.py](./src/tech_scaling.py)
+- **tech_params/**
+  - [analog_scaling.json](./tech_params/analog_scaling.json)
+  - [beol_feol_scaling.json](./tech_params/beol_feol_scaling.json)
+  - [cpa_scaling.json](./tech_params/cpa_scaling.json)
+  - [defect_density.json](./tech_params/defect_density.json)
+  - [dyn_pwr_scaling.json](./tech_params/dyn_pwr_scaling.json)
+  - [gates_perhr_scaling.json](./tech_params/gates_perhr_scaling.json)
+  - [logic_scaling.json](./tech_params/logic_scaling.json)
+  - [sram_scaling.json](./tech_params/sram_scaling.json)
+  - [transistors_scaling.json](./tech_params/transistors_scaling.json)
 
 ## Getting started
 
