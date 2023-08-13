@@ -8,11 +8,11 @@ emissions essential for HI systems, considering size, yield, and assembly proces
 
 ## Table of Contents
 
--   File structure
--   Getting started
--   Config and input definition
--   Running ECO-CHIP
--   Outputs
+-   [File structure](#file-structure)
+-   [Getting started](#getting-started)
+-   [Config and input definition](#input-definition-and-config)
+-   [Running ECO-CHIP](#running-eco-chip)
+-   [Outputs](#outputs)
 
 
 ## File structure
