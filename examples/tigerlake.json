@@ -1,13 +1,13 @@
 {
-"chiplet1" : {
+"CPU" : {
           "type" : "logic",
           "area" : 16.04
         },
-"chiplet2" : {
+"Analog" : {
           "type" : "analog",
           "area" : 24.47
         },
-"chiplet3" : {
+"Memory" : {
           "type" : "sram",
           "area" : 10.84
        }

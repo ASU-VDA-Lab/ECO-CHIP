@@ -1,0 +1,18 @@
+{
+"GPU_1" : {
+          "type" : "logic",
+          "area" : 202.505
+        },
+"GPU_2" : {
+          "type" : "logic",
+          "area" : 202.505
+        },
+"Analog" : {
+          "type" : "analog",
+          "area" : 92.03
+        },
+"Memory" : {
+          "type" : "sram",
+          "area" : 58.78
+       }
+}

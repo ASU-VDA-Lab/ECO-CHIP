@@ -1,0 +1,14 @@
+{
+"CPU" : {
+          "type" : "logic",
+          "area" : 93.55
+        },
+"Analog" : {
+          "type" : "analog",
+          "area" : 6.605
+        },
+"Memory" : {
+          "type" : "sram",
+          "area" : 18.36
+       }
+}
