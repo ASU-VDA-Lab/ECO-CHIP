@@ -4,11 +4,11 @@ Carbon footprint estimator for heterogenous chiplet-based systems.
 ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (design, manufacturing, and packaging). The tool supports the following HI and packaging architectures: RDL fanout, silicon bridge-based, passive and active interposer, and 3D integration. The tool evaluates the crucial package/assembly carbon
 emissions essential for HI systems, considering size, yield, and assembly process. In addition, it also estimates design CFP.  
 
-
+![image](eco-chip-top.png)
 
 ## Table of Contents
 
--   File structure 
+-   File structure
 -   Getting started
 -   Config and input definition
 -   Running ECO-CHIP
