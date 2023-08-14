@@ -91,7 +91,7 @@ if MAIN:
         nodes=file.readlines()
     nodes = [ast.literal_eval(node_item) for node_item in nodes]
     nodes = [data for inside_node in nodes for data in inside_node]
-    print("Nodes from node_list.txt file ",nodes)
+    #print("Nodes from node_list.txt file ",nodes)
 
     print(config_json)
     print(type(config_json))
@@ -109,10 +109,20 @@ if MAIN:
 
     #result = calculate_CO2(design,scaling_factors, [10,14], 'Tiger Lake')
     result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
+    print("Tiger Lake example")
+    print(" ---------------------------------------------------------")
+    print("Manufacture Carbon in Kgs ")
     print(result[0])
+    print(" ---------------------------------------------------------")
+    print("Design Carbon in Kgs ")
     print(result[1])
-    print(result[2])
+    print(" ---------------------------------------------------------")
+    print("Operational Carbon in Kgs ")
     print(result[3])
+    print(" ---------------------------------------------------------")
+    print("Total Carbon in Kgs ")
+    print(result[2])
+    print(" ---------------------------------------------------------")
 
 
     ##Working JSON
