@@ -20,6 +20,10 @@ ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (des
 - **config/**
   - [design.json](./config/design.json)
   - [node_list.txt](./config/node_list.txt)
+- **examples**
+  - [a15.json](./examples/a15.json)
+  - [ga102.json](./examples/ga102.json)
+  - [tigerlake.json](./examples/tigerlake.json)
 - [README.md](./README.md)
 - **src/**
   - [CO2_func.py](./src/CO2_func.py)
