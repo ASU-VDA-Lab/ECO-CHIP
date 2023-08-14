@@ -41,11 +41,11 @@ ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (des
 ### Prerequisites
 
 ECO-CHIP requires the following:
-```
+
 - python 3.6
 - pip 18.1
 - python3-venv
-```
+
 Additionally, please refer to the requirements.txt file in this repository. The packages in requirements.txt will be installed in a virtual environment.
 
 ### Download and install with bash
@@ -86,7 +86,7 @@ The above file can be extended to support any number of chiplets by adding more 
 
 ### Technology node list
 
-The [node_list.txt!](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. ECO-CHIP currently supports the following nodes 7nm,10nm,14nm,22nm, and 28nm. 
+The [node_list.txt!](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. ECO-CHIP currently supports the following nodes 7nm, 10nm, 14nm, 22nm, and 28nm. 
 
 
 ### Technology/scaling parameters 
