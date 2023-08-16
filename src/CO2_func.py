@@ -104,16 +104,16 @@ def power_chip(techs, types, scaling_factors,powers, lifetime, activity):
 #where to put the below constants  ? numBEOL ? RDLLayers? I think these are pkg parameters right ?
 
 
-numBEOL = 8 # even carbon distribution in  old nodes #DTCO
-RDLLayers = 6 
-EMIBLayers = 5 
-tsv_pitch = 25e-6/1e-3 #pitch per mm
-tsv_size = 5e-6 / 1e-3
+#numBEOL = 8 # even carbon distribution in  old nodes #DTCO
+#RDLLayers = 6 
+#EMIBLayers = 5 
+#tsv_pitch = 25e-6/1e-3 #pitch per mm
+#tsv_size = 5e-6 / 1e-3
 
 
-def Interposer(areas, techs, types, scaling_factors, interposer_type="passive", always_chiplets=False,
-               interposer_node=65, tsv_pitch=tsv_pitch, tsv_size=tsv_size, emib_pitch=10,
-               return_router_area=False
+def Interposer(areas, techs, types, scaling_factors, package_type="passive", always_chiplets=False,
+               interposer_node=65, tsv_pitch=0.025, tsv_size=0.005, RDLLayers=6, EMIBLayers=5, 
+               emib_pitch=10, numBEOL=8, return_router_area=False
               ):
     #TBD 
     # passive interposer
@@ -123,7 +123,7 @@ def Interposer(areas, techs, types, scaling_factors, interposer_type="passive", 
     #4. 65 nm defect density, 
     #5. pacage defect density
     #6. 65nm carbon per area
-    #7. packaging yield adjustments
+    #7. packaging yield adjustments  
     package_carbon = 0 
     router_carbon = 0 
     router_design = 0
@@ -136,14 +136,14 @@ def Interposer(areas, techs, types, scaling_factors, interposer_type="passive", 
         interposer_area = np.prod(interposer_area) 
 #         print(interposer_area, np.sum(areas))
         interposer_carbon, _, _ = Si_chip([interposer_node], ["logic"], [interposer_area],scaling_factors, True, always_chiplets)
-        if (interposer_type == "active"):
+        if (package_type == "active"):
             router_area = 4.47 * num_chiplets
             router_carbon = interposer_carbon * router_area / interposer_area
             _, router_design, _ = Si_chip([interposer_node], ["logic"], [router_area], scaling_factors ,True, always_chiplets)
             router_design = np.sum(router_design)
             #package_carbon = (interposer_carbon-router_carbon)* beolVfeol[65] 
             package_carbon = (interposer_carbon-router_carbon)* scaling_factors['beolVfeol'].loc[65,'beolVfeol'] 
-        elif (interposer_type == "3D"):
+        elif (package_type == "3D"):
             dims = np.sqrt(np.array(areas, dtype=np.float64))
             num_tsv_1d = np.floor(dims/tsv_pitch)
             overhead_3d = (num_tsv_1d**2) * (tsv_size**2)
@@ -155,18 +155,18 @@ def Interposer(areas, techs, types, scaling_factors, interposer_type="passive", 
             router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors ,False)
             router_carbon, router_design = np.sum(router_carbon), np.sum(router_design) 
             bonding_yield = bonding_yield**num_chiplets
-        elif interposer_type in ['passive', 'RDL', 'EMIB'] :
+        elif package_type in ['passive', 'RDL', 'EMIB'] :
 #             interposer_area = np.sum(areas)*1.1
             #0.33 in 16 convert to 7nm
             router_area = 0.33/np.array([scaling_factors[ty].loc[14, 'area'] for ty in types])
             router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors, False)
             router_carbon, router_design = np.sum(router_carbon), np.sum(router_design)
-            if interposer_type == 'passive':
+            if package_type == 'passive':
                 package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[interposer_node,'beolVfeol']
-            elif interposer_type == 'RDL':
+            elif package_type == 'RDL':
                 package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[interposer_node,'beolVfeol']
                 package_carbon *= RDLLayers/numBEOL    
-            elif (interposer_type == 'EMIB'):
+            elif (package_type == 'EMIB'):
                 emib_area =  [5*5]*num_if
 #                 print("NUMBER OF INTERFACES",num_if)
                 emib_carbon, _, _ = Si_chip([22]*num_if, ["logic"]*num_if, emib_area, scaling_factors, True)
@@ -212,7 +212,7 @@ def package_CO2(design, scaling_factors, techs):
         _, _, area_scale = Si_chip(techs=comb, types=design.type.values, areas=design.area.values,scaling_factors=scaling_factors )
         for i, package in enumerate(packaging_techs):
             carbon[n, 2*i], carbon[n, 2*i+1] = Interposer(areas=design.area.values*area_scale, techs=comb, 
-                                                           types = design.type.values,scaling_factors=scaling_factors, interposer_type=package)
+                                                           types = design.type.values,scaling_factors=scaling_factors, package_type=package)
     
     labels = [x+y for x in packaging_techs for y in [" package", " router"]]
     carbon = pd.DataFrame(data=carbon, index=combinations, columns=labels)
@@ -226,11 +226,13 @@ def package_CO2(design, scaling_factors, techs):
 #Do we need to add plots for this func? We could remove these lines  
 
 
-def calculate_CO2(design, scaling_factors, techs, design_name='', interposer_type='RDL', always_chiplets=False,
+def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, package_type='RDL', always_chiplets=False,
                   lifetime = 2*365*24, activity=[0.2, 0.667, 0.1], Ns = 1e5, Nc=None, plot=False,package_factor=1,
-                  return_ap=False, in_combinations=None
+                  return_ap=False, in_combinations=None,interposer_node=65, rdl_layer = 6, emib_layers = 5, emib_pitch=10, tsv_pitch = 0.025,
+                  tsv_size = 0.005, num_beol = 8
                  ):
-    num_iter = 90
+    #num_iter = 90
+    
     if in_combinations is None:
         combinations = list(it.product(techs, repeat=len(design.index)))
     else:
@@ -245,7 +247,8 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', interposer_typ
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
                                                                   areas=design.area.values,scaling_factors=scaling_factors, always_chiplets=always_chiplets )
         package_c, router_c, design_carbon[n,-1], router_a =Interposer(areas=design.area.values*area_scale, techs=comb, types=design.type.values,scaling_factors=scaling_factors,
-                                          interposer_type=interposer_type, always_chiplets=always_chiplets, return_router_area=True)
+                                          package_type=package_type, always_chiplets=always_chiplets, interposer_node=interposer_node,
+                                          tsv_pitch=tsv_pitch, tsv_size=tsv_size, RDLLayers=rdl_layer, EMIBLayers=emib_layers, emib_pitch=emib_pitch, numBEOL=num_beol, return_router_area=True)
         carbon[n, -1] = package_c*package_factor + router_c
         
         op_carbon[n,:-1], powers[n, :] = power_chip(comb, design.type.values,scaling_factors, design.power.values, lifetime, activity)
@@ -256,11 +259,11 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', interposer_typ
     else:
         design_carbon *= num_iter/Nc[None,:]
         total_carbon = carbon + design_carbon + op_carbon
-    carbon = pd.DataFrame(data=carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
-    design_carbon = pd.DataFrame(data=design_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
-    op_carbon = pd.DataFrame(data=op_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
+    carbon = pd.DataFrame(data=carbon, index=combinations, columns=(list(design.index) + ["Packaging"]))
+    design_carbon = pd.DataFrame(data=design_carbon, index=combinations, columns=(list(design.index) + ["Packaging"]))
+    op_carbon = pd.DataFrame(data=op_carbon, index=combinations, columns=(list(design.index) + ["Packaging"]))
     #     total_carbon =  carbon + (design_carbon*10/1e5)+ 0.8*(design_carbon*100/1e5)
-    total_carbon = pd.DataFrame(data=total_carbon, index=combinations, columns=(list(design.index) + ["packaging"]))
+    total_carbon = pd.DataFrame(data=total_carbon, index=combinations, columns=(list(design.index) + ["Packaging"]))
     
         
     if plot:

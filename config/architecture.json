@@ -10,5 +10,6 @@
 "chiplet3" : {
           "type" : "sram",
           "area" : 10.84
-       }
+       },
+"pkg_type" : "RDL"
 }

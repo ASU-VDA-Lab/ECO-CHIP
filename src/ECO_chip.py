@@ -78,7 +78,7 @@ if MAIN:
     parser.add_argument(
             '--design',
             default=None,
-            help='use existing template for design "--design config/design.js"'
+            help='use existing template for design "--design config/architecture.json"'
         )
     
     
@@ -100,16 +100,49 @@ if MAIN:
     print(type(design))
     print(design)
     print("done")   #TODO CCS remove
+    package_type = design.loc['pkg_type']
+    package_type = package_type[0]
+    
+    design = design.drop(index='pkg_type')
+    print(design)
 
-    power = 15
+    #power = 450
+    #powers = design.area.values * power / design.area.values.sum()
+    #design.insert(loc=2,column='power',value=powers)
+    #print(design)
+
+    with open("config/designC.json", 'r') as f:
+        designC_values = json.load(f)
+    power = float(designC_values['power'])
     powers = design.area.values * power / design.area.values.sum()
+    num_iter = designC_values['num_iter']
+    num_prt_mfg = designC_values['num_prt_mfg']
 
     design.insert(loc=2,column='power',value=powers)
     print(design)
+    
+    with open("config/operationalC.json",'r') as f:
+        operationalC_values = json.load(f)
+    lifetime = operationalC_values['lifetime']
+    print("Lifetime value = ",lifetime)
+    
+    with open("config/packageC.json",'r') as f:
+        packageC_values = json.load(f)
+    interposer_node = packageC_values['interposer_node']
+    rdl_layer = packageC_values['rdl_layers']
+    emib_layers = packageC_values['emib_layers']
+    emib_pitch = packageC_values['emib_pitch']
+    tsv_pitch = packageC_values['tsv_pitch']
+    tsv_size = packageC_values['tsv_size']
+    numBEOL = packageC_values['num_beol']
+    
 
-    #result = calculate_CO2(design,scaling_factors, [10,14], 'Tiger Lake')
-    result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
-    print("Tiger Lake example")
+    #result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
+    result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake',
+                           num_iter,package_type=package_type ,Ns=num_prt_mfg,lifetime=lifetime,
+                           interposer_node = interposer_node, rdl_layer=rdl_layer, emib_layers=emib_layers,
+                           emib_pitch=emib_pitch, tsv_pitch=tsv_pitch, tsv_size=tsv_size, num_beol=numBEOL)
+    print("Tiger Lake Example")
     print(" ---------------------------------------------------------")
     print("Manufacture Carbon in Kgs ")
     print(result[0])
