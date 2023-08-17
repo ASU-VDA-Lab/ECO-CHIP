@@ -36,7 +36,7 @@ designC_file = design_dir+'designC.json'
 operationalC_file = design_dir+'operationalC.json'
 packageC_file = design_dir+'packageC.json'
 print(" ---------------------------------------------------------")
-print("Using below files for CFP estimations")
+print("Using below files for CFP estimations : \n")
 print(architecture_file)
 print(node_list_file)
 print(designC_file)
@@ -80,7 +80,7 @@ num_iter = designC_values['num_iter']
 num_prt_mfg = designC_values['num_prt_mfg']
 
 design.insert(loc=2,column='power',value=powers)
-print(design)
+#print(design)
 print(" ")
     
 with open(operationalC_file,'r') as f:

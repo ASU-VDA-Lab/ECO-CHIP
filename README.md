@@ -153,18 +153,15 @@ python3 src/ECO_chip.py --design_dir testcases/GA102/
 Example output for Tiger Lake test case with 7nm and 10nm nodes in node_list.txt file. 
 
 ```
- ---------------------------------------------------------
-Using below files for CFP estimations
+---------------------------------------------------------
+Using below files for CFP estimations : 
+
 testcases/TigerLake/architecture.json
 testcases/TigerLake/node_list.txt
 testcases/TigerLake/designC.json
 testcases/TigerLake/operationalC.json
 testcases/TigerLake/packageC.json
  ---------------------------------------------------------
-          type   area     power
-CPU      logic  16.04  4.685492
-Analog  analog  24.47  7.148004
-Memory    sram  10.84  3.166504
  
 Tiger Lake Example
  ---------------------------------------------------------
