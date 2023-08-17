@@ -3,6 +3,7 @@ import itertools as it
 from   matplotlib import pyplot as plt
 from tech_scaling import *
 
+##############################################
 #Yeild Calculation 
 def yield_calc(area, defect_density):
     yield_val = (1+(defect_density*1e4)*(area*1e-6)/10)**-10
@@ -57,7 +58,7 @@ def recursive_split(areas, axis=0, emib_pitch=10):
 
 ################################################
 #TODO : Remove comments 
-# How to access scaling_factors ? I am addeing htis as gunction input 
+
 
 def Si_chip(techs, types, areas,scaling_factors,packaging=False, always_chiplets=False):
     area = np.array(areas)
@@ -101,14 +102,7 @@ def power_chip(techs, types, scaling_factors,powers, lifetime, activity):
 
 ###############################################
 #TODO : Remove comments 
-#where to put the below constants  ? numBEOL ? RDLLayers? I think these are pkg parameters right ?
 
-
-#numBEOL = 8 # even carbon distribution in  old nodes #DTCO
-#RDLLayers = 6 
-#EMIBLayers = 5 
-#tsv_pitch = 25e-6/1e-3 #pitch per mm
-#tsv_size = 5e-6 / 1e-3
 
 
 def Interposer(areas, techs, types, scaling_factors, package_type="passive", always_chiplets=False,
@@ -223,7 +217,7 @@ def package_CO2(design, scaling_factors, techs):
 
 ###############################################
 #TODO : remove comments 
-#Do we need to add plots for this func? We could remove these lines  
+ 
 
 
 def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, package_type='RDL', always_chiplets=False,
