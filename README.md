@@ -93,7 +93,7 @@ ECO-CHIP has three inputs, including a design configuration file, a list of supp
 
 ### Architecture configuration
 
-The input system architecture is specified in [architecture.json!](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL","EMIB","passive","active" and "3D". The area of each chiplet is also specified, as shown below.  
+The input system architecture is specified in [architecture.json!](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL", "EMIB", "passive", "active" and "3D". The area of each chiplet is also specified, as shown below.  
 
 ```
 {
