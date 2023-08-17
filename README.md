@@ -153,7 +153,7 @@ python3 src/ECO_chip.py --design_dir testcases/GA102/
 Example output for Tiger Lake test case with 7nm and 10nm nodes in node_list.txt file. 
 
 ```
----------------------------------------------------------
+ ---------------------------------------------------------
 Using below files for CFP estimations
 testcases/TigerLake/architecture.json
 testcases/TigerLake/node_list.txt
@@ -168,7 +168,7 @@ Memory    sram  10.84  3.166504
  
 Tiger Lake Example
  ---------------------------------------------------------
-Manufacture Carbon in Kgs 
+Manufacture Carbon in grams 
                      CPU      Analog      Memory   Packaging
 (7, 7, 7)     464.214115  708.186995  313.720761    0.000000
 (7, 7, 10)    432.766506  671.391611  213.804363  241.024435
@@ -179,7 +179,7 @@ Manufacture Carbon in Kgs
 (10, 10, 7)   630.761119  489.914178  289.450300  303.964709
 (10, 10, 10)  655.606228  513.023394  227.264961    0.000000
  ---------------------------------------------------------
-Design Carbon in Kgs 
+Design Carbon in grams 
                      CPU      Analog      Memory  Packaging
 (7, 7, 7)     287.080073  437.958191  194.011720   0.000000
 (7, 7, 10)    287.080073  437.958191   90.660565   8.948917
@@ -190,7 +190,7 @@ Design Carbon in Kgs
 (10, 10, 7)   261.534514  204.655353  194.011720   7.314468
 (10, 10, 10)  261.534514  204.655353   90.660565   0.000000
  ---------------------------------------------------------
-Operational Carbon in Kgs 
+Operational Carbon in grams 
                       CPU       Analog       Memory  Packaging
 (7, 7, 7)     3329.401525  5079.205444  2250.044422        0.0
 (7, 7, 10)    3329.401525  5079.205444  2054.413792        0.0
@@ -201,7 +201,7 @@ Operational Carbon in Kgs
 (10, 10, 7)   3762.284583  4637.592758  2250.044422        0.0
 (10, 10, 10)  3762.284583  4637.592758  2054.413792        0.0
  ---------------------------------------------------------
-Total Carbon in Kgs 
+Total Carbon in grams 
                       CPU       Analog       Memory   Packaging
 (7, 7, 7)     4080.695713  6225.350630  2757.776904    0.000000
 (7, 7, 10)    4049.248104  6188.555247  2358.878721  249.973352

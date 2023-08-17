@@ -1,5 +1,5 @@
 {
 	"power"       : 225,
-	"num_iter" 	  : 90,
+	"num_iter" 	  : 100,
 	"num_prt_mfg" : 1e5
 }
