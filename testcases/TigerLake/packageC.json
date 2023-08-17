@@ -1,0 +1,9 @@
+{
+	"interposer_node" : 65,
+	"rdl_layers"	  : 6,
+	"emib_layers"	  : 5,
+	"tsv_pitch"		  : 0.025,
+	"tsv_size"		  : 0.005,
+	"num_beol"		  : 8,
+	"emib_pitch"	  : 10
+}

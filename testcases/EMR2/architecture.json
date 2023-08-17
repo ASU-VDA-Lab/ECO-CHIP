@@ -6,5 +6,6 @@
 "CPU_1" : {
           "type" : "logic",
           "area" : 595.95
-        }
+        },
+"pkg_type" : "RDL"
 }
