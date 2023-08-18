@@ -181,6 +181,7 @@ Total Carbon in Kgs
 
 Example output for GA102 testcase with 7nm,10nm and 14nm in the node_list.txt file.
 
+
 ```
  ---------------------------------------------------------
 Using below files for CFP estimations : 
@@ -224,6 +225,7 @@ Total Carbon in Kgs
 (14, 14, 10)  255.435629  23.178908  16.669729   9.697634
 (14, 14, 14)  272.730433  28.346999  25.408279   0.000000
  ---------------------------------------------------------
+
 ```
 
 
