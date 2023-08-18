@@ -13,13 +13,13 @@ def yield_calc(area, defect_density):
 #TODO remove old commented codes
 #TODO where does the below 3 constants go?
 
-Trasistors_per_gate = 8 
-Power_per_core = 10
-Carbon_per_kWh = 700
+#Trasistors_per_gate = 8 
+#Power_per_core = 10
+#Carbon_per_kWh = 700
 
-def design_costs(areas, comb,scaling_factors):
+def design_costs(areas, comb,scaling_factors,Transistors_per_gate,Power_per_core,Carbon_per_kWh):
     transistors = areas * np.array([scaling_factors['transistors_per_mm2'].loc[x,'Transistors_per_mm2'] for x in comb])
-    gates = transistors/Trasistors_per_gate
+    gates = transistors/Transistors_per_gate
     CPU_core_hours = gates/np.array([scaling_factors['gates_per_hr_per_core'].loc[x,'Gates_per_hr_per_core'] for x in comb])
     total_energy = Power_per_core*CPU_core_hours/1000 #in kWh
     design_carbon = Carbon_per_kWh * total_energy
@@ -60,13 +60,13 @@ def recursive_split(areas, axis=0, emib_pitch=10):
 #TODO : Remove comments 
 
 
-def Si_chip(techs, types, areas,scaling_factors,packaging=False, always_chiplets=False):
+def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per_core=10,Carbon_per_kWh=700,packaging=False, always_chiplets=False):
     area = np.array(areas)
     cpa =  np.array([scaling_factors['cpa'].loc[c, 'cpa'] for c in techs])
 #     delay =  np.array([scaling_factors[ty].loc[techs[i], 'delay'] for i, ty in enumerate(types)])
     if not packaging:
         area_scale = np.array([scaling_factors[ty].loc[techs[i], 'area'] for i, ty in enumerate(types)])
-        design_carbon = design_costs(areas*area_scale, techs,scaling_factors)
+        design_carbon = design_costs(areas*area_scale, techs,scaling_factors,Transistors_per_gate,Power_per_core,Carbon_per_kWh)
         defect_den = scaling_factors['defect_den']
     else:
         design_carbon = 0
@@ -87,7 +87,7 @@ def Si_chip(techs, types, areas,scaling_factors,packaging=False, always_chiplets
 ###############################################
 #TODO 
 
-def power_chip(techs, types, scaling_factors,powers, lifetime, activity):
+def power_chip(techs, types, scaling_factors,powers, lifetime, activity,Carbon_per_kWh):
     active = activity[0]
     on = activity[1]
     avg_pwr = activity[2]
@@ -107,7 +107,8 @@ def power_chip(techs, types, scaling_factors,powers, lifetime, activity):
 
 def Interposer(areas, techs, types, scaling_factors, package_type="passive", always_chiplets=False,
                interposer_node=65, tsv_pitch=0.025, tsv_size=0.005, RDLLayers=6, EMIBLayers=5, 
-               emib_pitch=10, numBEOL=8, return_router_area=False
+               emib_pitch=10, numBEOL=8, transistors_per_gate=8, power_per_core=10,
+               carbon_per_kWh=700, return_router_area=False
               ):
     #TBD 
     # passive interposer
@@ -129,11 +130,13 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
         num_if = np.int(np.ceil(num_if))
         interposer_area = np.prod(interposer_area) 
 #         print(interposer_area, np.sum(areas))
-        interposer_carbon, _, _ = Si_chip([interposer_node], ["logic"], [interposer_area],scaling_factors, True, always_chiplets)
+        interposer_carbon, _, _ = Si_chip([interposer_node], ["logic"], [interposer_area],scaling_factors,
+                                          transistors_per_gate, power_per_core,carbon_per_kWh, True, always_chiplets)
         if (package_type == "active"):
             router_area = 4.47 * num_chiplets
             router_carbon = interposer_carbon * router_area / interposer_area
-            _, router_design, _ = Si_chip([interposer_node], ["logic"], [router_area], scaling_factors ,True, always_chiplets)
+            _, router_design, _ = Si_chip([interposer_node], ["logic"], [router_area],scaling_factors, 
+                                          transistors_per_gate, power_per_core,carbon_per_kWh, True, always_chiplets)
             router_design = np.sum(router_design)
             #package_carbon = (interposer_carbon-router_carbon)* beolVfeol[65] 
             package_carbon = (interposer_carbon-router_carbon)* scaling_factors['beolVfeol'].loc[65,'beolVfeol'] 
@@ -142,18 +145,22 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
             num_tsv_1d = np.floor(dims/tsv_pitch)
             overhead_3d = (num_tsv_1d**2) * (tsv_size**2)
             area_3d = areas + overhead_3d
-            carbon3d, _, _ = Si_chip(techs, types, area_3d,scaling_factors, False, always_chiplets)
-            carbon2d, _, _ = Si_chip(techs, types, areas,scaling_factors ,False, always_chiplets)
+            carbon3d, _, _ = Si_chip(techs, types, area_3d,scaling_factors,transistors_per_gate,
+                                     power_per_core,carbon_per_kWh,False, always_chiplets)
+            carbon2d, _, _ = Si_chip(techs, types, areas,scaling_factors,transistors_per_gate,
+                                     power_per_core,carbon_per_kWh,False, always_chiplets)
             package_carbon = np.sum(carbon3d-carbon2d)
             router_area = 0.33/np.array([scaling_factors[ty].loc[14, 'area'] for ty in types])
-            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors ,False)
+            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors,transistors_per_gate,
+                                                      power_per_core,carbon_per_kWh,False)
             router_carbon, router_design = np.sum(router_carbon), np.sum(router_design) 
             bonding_yield = bonding_yield**num_chiplets
         elif package_type in ['passive', 'RDL', 'EMIB'] :
 #             interposer_area = np.sum(areas)*1.1
             #0.33 in 16 convert to 7nm
             router_area = 0.33/np.array([scaling_factors[ty].loc[14, 'area'] for ty in types])
-            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors, False)
+            router_carbon, router_design, _ = Si_chip(techs, types, router_area,scaling_factors,transistors_per_gate,
+                                                      power_per_core,carbon_per_kWh,False)
             router_carbon, router_design = np.sum(router_carbon), np.sum(router_design)
             if package_type == 'passive':
                 package_carbon = interposer_carbon* scaling_factors['beolVfeol'].loc[interposer_node,'beolVfeol']
@@ -163,7 +170,8 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
             elif (package_type == 'EMIB'):
                 emib_area =  [5*5]*num_if
 #                 print("NUMBER OF INTERFACES",num_if)
-                emib_carbon, _, _ = Si_chip([22]*num_if, ["logic"]*num_if, emib_area, scaling_factors, True)
+                emib_carbon, _, _ = Si_chip([22]*num_if, ["logic"]*num_if, emib_area, scaling_factors,transistors_per_gate,
+                                            power_per_core,carbon_per_kWh,True)
                 package_carbon = np.sum(emib_carbon)* scaling_factors['beolVfeol'].loc[22,'beolVfeol'] 
         else:
             raise NotImplemented
@@ -222,7 +230,8 @@ def package_CO2(design, scaling_factors, techs):
 
 def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, package_type='RDL', always_chiplets=False,
                   lifetime = 2*365*24, activity=[0.2, 0.667, 0.1], Ns = 1e5, Nc=None, plot=False,package_factor=1,
-                  return_ap=False, in_combinations=None,interposer_node=65, rdl_layer = 6, emib_layers = 5, emib_pitch=10, tsv_pitch = 0.025,
+                  return_ap=False, in_combinations=None, transistors_per_gate=8, power_per_core=10, carbon_per_kWh=700,
+                  interposer_node=65, rdl_layer = 6, emib_layers = 5, emib_pitch=10, tsv_pitch = 0.025,
                   tsv_size = 0.005, num_beol = 8
                  ):
     #num_iter = 90
@@ -239,13 +248,15 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, p
     powers =  np.zeros((len(combinations), len(design.index)))
     for n, comb in enumerate(combinations):
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
-                                                                  areas=design.area.values,scaling_factors=scaling_factors, always_chiplets=always_chiplets )
+                                                                  areas=design.area.values,scaling_factors=scaling_factors, Transistors_per_gate=transistors_per_gate,
+                                                                  Power_per_core=power_per_core,Carbon_per_kWh=carbon_per_kWh, always_chiplets=always_chiplets )
         package_c, router_c, design_carbon[n,-1], router_a =Interposer(areas=design.area.values*area_scale, techs=comb, types=design.type.values,scaling_factors=scaling_factors,
                                           package_type=package_type, always_chiplets=always_chiplets, interposer_node=interposer_node,
-                                          tsv_pitch=tsv_pitch, tsv_size=tsv_size, RDLLayers=rdl_layer, EMIBLayers=emib_layers, emib_pitch=emib_pitch, numBEOL=num_beol, return_router_area=True)
+                                          tsv_pitch=tsv_pitch, tsv_size=tsv_size, RDLLayers=rdl_layer, EMIBLayers=emib_layers, emib_pitch=emib_pitch, numBEOL=num_beol, 
+                                          transistors_per_gate=transistors_per_gate,power_per_core=power_per_core,carbon_per_kWh=carbon_per_kWh,return_router_area=True)
         carbon[n, -1] = package_c*package_factor + router_c
         
-        op_carbon[n,:-1], powers[n, :] = power_chip(comb, design.type.values,scaling_factors, design.power.values, lifetime, activity)
+        op_carbon[n,:-1], powers[n, :] = power_chip(comb, design.type.values,scaling_factors, design.power.values, lifetime, activity,Carbon_per_kWh=carbon_per_kWh)
         areas[n] =  design.area.values*area_scale +router_a
     if Nc is None:
         design_carbon *= num_iter/Ns
