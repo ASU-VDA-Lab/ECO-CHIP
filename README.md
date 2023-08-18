@@ -71,8 +71,8 @@ ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (des
 
 ECO-CHIP requires the following:
 
-- python 3.6
-- pip 18.1
+- python 3.9
+- pip 22.04
 - python3-venv
 
 Additionally, please refer to the requirements.txt file in this repository. The packages in requirements.txt will be installed in a virtual environment.
