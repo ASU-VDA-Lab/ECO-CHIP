@@ -180,6 +180,7 @@ Total Carbon in Kgs
 ```
 
 Example output for GA102 testcase with 7nm,10nm and 14nm in the node_list.txt file.
+
 ```
  ---------------------------------------------------------
 Using below files for CFP estimations : 
