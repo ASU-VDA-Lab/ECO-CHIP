@@ -1,5 +1,8 @@
 {
 	"power"       : 225,
 	"num_iter" 	  : 100,
-	"num_prt_mfg" : 1e5
+	"num_prt_mfg" : 1e5,
+	"Transistors_per_gate" : 8,
+	"Power_per_core" : 10,
+	"Carbon_per_kWh" : 700
 }
