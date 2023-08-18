@@ -93,7 +93,7 @@ ECO-CHIP has three inputs, including a design configuration file, a list of supp
 
 ### Architecture configuration
 
-The input system architecture is specified in [architecture.json!](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL", "EMIB", "passive", "active" and "3D". The area of each chiplet is also specified in mm2, as shown below.  
+The input system architecture is specified in [architecture.json](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL", "EMIB", "passive", "active" and "3D". The area of each chiplet is also specified in mm2, as shown below.  
 
 ```
 {
@@ -115,22 +115,22 @@ The input system architecture is specified in [architecture.json!](config/exampl
 The above file can be extended to support any number of chiplets by adding more entries to the JSON file. 
 
 ### Design carbon parameters
-The [designC.json](./config/example/designC.json) includes parameters such as number of design iterations, volume(indicating the number of manufactured parts), and the overall architecture power. Additionally, it encompasses parameters like transistors_per_gate, power_per_core that is the power consumed by compute used for design, as well as carbon_per_kWh, indicating the carbon footprint per kWh from the source. These parameters are used in calculating the design carbon footprint. 
+The [designC.json](./config/example/designC.json) includes parameters such as the number of design iterations, volume (indicating the number of manufactured parts), and the overall architecture power. Additionally, it encompasses parameters like transistors_per_gate, power_per_core which is the power consumed by the compute resources used for design, as well as carbon_per_kWh, indicating the carbon footprint per kWh from the source. The transistor per gate is used to calculate the number of logic gates in the design which is further used to evaluate design effort. 
 
 ### Technology node list
 
-The [node_list.txt!](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. ECO-CHIP currently supports the following nodes 7nm, 10nm, 14nm, 22nm, and 28nm. 
+The [node_list.txt](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. ECO-CHIP currently supports the following nodes 7nm, 10nm, 14nm, 22nm, and 28nm. 
 
 ### Operational carbon parameters
 In [operationalC.json](./config/example/operationalC.json) the lifetime value parameter is provided in hours as its unit of measurement. The current example file demonstrates a lifetime of 2 years (2*365*24 = 17520)
 
 ### Pacakge carbon parameters
-The [packageC.json](./config/example/packageC.json) contains all the package related parameters. Interposer node defines the technology node for the interposer used, RDLLayer defines the number of RDL layers, TSV pitch (pitch per mm) and TSV size (per mm) used for 3D packaging architecure, EMIB bridge range value is defined with emib_pitch parameter and the numBEOL for number of BEOL layers. 
+The [packageC.json](./config/example/packageC.json) contains all the package-related parameters. The Interposer node defines the technology node for the interposer used, RDLLayer defines the number of RDL layers, TSV pitch (pitch per mm) and TSV size (per mm) used for 3D packaging architecture, EMIB bridge range value is defined with emib_pitch parameter and the numBEOL for number of BEOL layers. 
 
 ### Technology/scaling parameters 
 
-The [tech params directory!](./tech_params/.) holds the scaling factors along with other additional parameters such as CPA, defect density, area scaling, and dynamic_power scaling values  needed for computing CFP for a given chiplet type. 
-Analog, logic, and memory exhibit varying scaling rates [[1]][AMD-scaling] [[2]][Intel-Scaling]. Incorporating the transistor density scaling trends from [[3]][TSMC-scaling] [[4]][SRAM-scaling] allows us to address distinct scaling factors for different design types. By factoring in scaling trends in analog, memory and logic, ECO-CHIP computes CFP.
+The [tech params directory](./tech_params/.) holds the scaling factors along with other additional parameters such as CPA, defect density, area scaling, and dynamic_power scaling values  needed for computing CFP for a given chiplet type. 
+Analog, logic, and memory exhibit varying scaling rates [[1]][AMD-scaling] [[2]][Intel-Scaling]. Incorporating the transistor density scaling trends from [[3]][TSMC-scaling] [[4]][SRAM-scaling] allows us to address distinct scaling factors for different design types. By factoring in scaling trends in analog, memory, and logic, ECO-CHIP computes CFP.
 
 
 ## Running ECO-CHIP
@@ -166,39 +166,6 @@ testcases/TigerLake/packageC.json
  
 Tiger Lake Example
  ---------------------------------------------------------
-Manufacture Carbon in Kgs 
-                   CPU    Analog    Memory  Packaging
-(7, 7, 7)     0.464214  0.708187  0.313721   0.000000
-(7, 7, 10)    0.432767  0.671392  0.213804   0.241024
-(7, 10, 7)    0.432767  0.489914  0.289450   0.239972
-(7, 10, 10)   0.432767  0.489914  0.213804   0.238808
-(10, 7, 7)    0.630761  0.671392  0.289450   0.306181
-(10, 7, 10)   0.630761  0.671392  0.213804   0.305017
-(10, 10, 7)   0.630761  0.489914  0.289450   0.303965
-(10, 10, 10)  0.655606  0.513023  0.227265   0.000000
- ---------------------------------------------------------
-Design Carbon in Kgs 
-                   CPU    Analog    Memory  Packaging
-(7, 7, 7)     0.287080  0.437958  0.194012   0.000000
-(7, 7, 10)    0.287080  0.437958  0.090661   0.008949
-(7, 10, 7)    0.287080  0.204655  0.194012   0.007456
-(7, 10, 10)   0.287080  0.204655  0.090661   0.005803
-(10, 7, 7)    0.261535  0.437958  0.194012   0.010461
-(10, 7, 10)   0.261535  0.437958  0.090661   0.008807
-(10, 10, 7)   0.261535  0.204655  0.194012   0.007314
-(10, 10, 10)  0.261535  0.204655  0.090661   0.000000
- ---------------------------------------------------------
-Operational Carbon in Kgs 
-                   CPU    Analog    Memory  Packaging
-(7, 7, 7)     3.329402  5.079205  2.250044        0.0
-(7, 7, 10)    3.329402  5.079205  2.054414        0.0
-(7, 10, 7)    3.329402  4.637593  2.250044        0.0
-(7, 10, 10)   3.329402  4.637593  2.054414        0.0
-(10, 7, 7)    3.762285  5.079205  2.250044        0.0
-(10, 7, 10)   3.762285  5.079205  2.054414        0.0
-(10, 10, 7)   3.762285  4.637593  2.250044        0.0
-(10, 10, 10)  3.762285  4.637593  2.054414        0.0
- ---------------------------------------------------------
 Total Carbon in Kgs 
                    CPU    Analog    Memory  Packaging
 (7, 7, 7)     4.080696  6.225351  2.757777   0.000000
@@ -224,97 +191,7 @@ testcases/GA102/operationalC.json
 testcases/GA102/packageC.json
  ---------------------------------------------------------
  
-Tiger Lake Example
- ---------------------------------------------------------
-Manufacture Carbon in Kgs 
-                   GPU_1    Analog    Memory  Packaging
-(7, 7, 7)      33.031323  7.152473  4.568319   0.000000
-(7, 7, 10)     25.109840  2.885880  1.221889   2.833723
-(7, 7, 14)     25.109840  2.885880  2.081892   3.105274
-(7, 10, 7)     25.109840  1.983742  1.726342   2.832670
-(7, 10, 10)    25.109840  1.983742  1.221889   2.831506
-(7, 10, 14)    25.109840  1.983742  2.081892   3.103057
-(7, 14, 7)     25.109840  1.683041  1.726342   2.831786
-(7, 14, 10)    25.109840  1.683041  1.221889   2.830622
-(7, 14, 14)    25.109840  1.683041  2.081892   3.102173
-(10, 7, 7)     38.633723  2.885880  1.726342   5.088000
-(10, 7, 10)    38.633723  2.885880  1.221889   5.086836
-(10, 7, 14)    38.633723  2.885880  2.081892   5.485745
-(10, 10, 7)    38.633723  1.983742  1.726342   5.085783
-(10, 10, 10)   44.925944  4.989902  3.187074   0.000000
-(10, 10, 14)   38.633723  1.983742  2.081892   5.483528
-(10, 14, 7)    38.633723  1.683041  1.726342   5.084899
-(10, 14, 10)   38.633723  1.683041  1.221889   5.083735
-(10, 14, 14)   38.633723  1.683041  2.081892   5.482644
-(14, 7, 7)    100.074929  2.885880  1.726342   9.697422
-(14, 7, 10)   100.074929  2.885880  1.221889   9.696258
-(14, 7, 14)   100.074929  2.885880  2.081892  10.334784
-(14, 10, 7)   100.074929  1.983742  1.726342   9.695205
-(14, 10, 10)  100.074929  1.983742  1.221889   9.694041
-(14, 10, 14)  100.074929  1.983742  2.081892  10.332567
-(14, 14, 7)   100.074929  1.683041  1.726342   9.694321
-(14, 14, 10)  100.074929  1.683041  1.221889   9.693157
-(14, 14, 14)  117.369733  6.851132  8.326281   0.000000
- ---------------------------------------------------------
-Design Carbon in Kgs 
-                 GPU_1    Analog    Memory  Packaging
-(7, 7, 7)     8.451919  1.830145  1.168923   0.000000
-(7, 7, 10)    8.451919  1.830145  0.546231   0.009943
-(7, 7, 14)    8.451919  1.830145  0.485588   0.009764
-(7, 10, 7)    8.451919  0.855216  1.168923   0.008285
-(7, 10, 10)   8.451919  0.855216  0.546231   0.006447
-(7, 10, 14)   8.451919  0.855216  0.485588   0.006268
-(7, 14, 7)    8.451919  0.399557  1.168923   0.006651
-(7, 14, 10)   8.451919  0.399557  0.546231   0.004813
-(7, 14, 14)   8.451919  0.399557  0.485588   0.004635
-(10, 7, 7)    7.699833  1.830145  1.168923   0.011623
-(10, 7, 10)   7.699833  1.830145  0.546231   0.009786
-(10, 7, 14)   7.699833  1.830145  0.485588   0.009607
-(10, 10, 7)   7.699833  0.855216  1.168923   0.008127
-(10, 10, 10)  7.699833  0.855216  0.546231   0.000000
-(10, 10, 14)  7.699833  0.855216  0.485588   0.006111
-(10, 14, 7)   7.699833  0.399557  1.168923   0.006493
-(10, 14, 10)  7.699833  0.399557  0.546231   0.004656
-(10, 14, 14)  7.699833  0.399557  0.485588   0.004477
-(14, 7, 7)    6.844994  1.830145  1.168923   0.011444
-(14, 7, 10)   6.844994  1.830145  0.546231   0.009607
-(14, 7, 14)   6.844994  1.830145  0.485588   0.009428
-(14, 10, 7)   6.844994  0.855216  1.168923   0.007948
-(14, 10, 10)  6.844994  0.855216  0.546231   0.006111
-(14, 10, 14)  6.844994  0.855216  0.485588   0.005932
-(14, 14, 7)   6.844994  0.399557  1.168923   0.006314
-(14, 14, 10)  6.844994  0.399557  0.546231   0.004477
-(14, 14, 14)  6.844994  0.399557  0.485588   0.000000
- ---------------------------------------------------------
-Operational Carbon in Kgs 
-                   GPU_1     Analog     Memory  Packaging
-(7, 7, 7)     118.006498  25.552665  16.320609        0.0
-(7, 7, 10)    118.006498  25.552665  14.901610        0.0
-(7, 7, 14)    118.006498  25.552665  16.596411        0.0
-(7, 10, 7)    118.006498  23.330982  16.320609        0.0
-(7, 10, 10)   118.006498  23.330982  14.901610        0.0
-(7, 10, 14)   118.006498  23.330982  16.596411        0.0
-(7, 14, 7)    118.006498  21.096310  16.320609        0.0
-(7, 14, 10)   118.006498  21.096310  14.901610        0.0
-(7, 14, 14)   118.006498  21.096310  16.596411        0.0
-(10, 7, 7)    133.349499  25.552665  16.320609        0.0
-(10, 7, 10)   133.349499  25.552665  14.901610        0.0
-(10, 7, 14)   133.349499  25.552665  16.596411        0.0
-(10, 10, 7)   133.349499  23.330982  16.320609        0.0
-(10, 10, 10)  133.349499  23.330982  14.901610        0.0
-(10, 10, 14)  133.349499  23.330982  16.596411        0.0
-(10, 14, 7)   133.349499  21.096310  16.320609        0.0
-(10, 14, 10)  133.349499  21.096310  14.901610        0.0
-(10, 14, 14)  133.349499  21.096310  16.596411        0.0
-(14, 7, 7)    148.515706  25.552665  16.320609        0.0
-(14, 7, 10)   148.515706  25.552665  14.901610        0.0
-(14, 7, 14)   148.515706  25.552665  16.596411        0.0
-(14, 10, 7)   148.515706  23.330982  16.320609        0.0
-(14, 10, 10)  148.515706  23.330982  14.901610        0.0
-(14, 10, 14)  148.515706  23.330982  16.596411        0.0
-(14, 14, 7)   148.515706  21.096310  16.320609        0.0
-(14, 14, 10)  148.515706  21.096310  14.901610        0.0
-(14, 14, 14)  148.515706  21.096310  16.596411        0.0
+GA102 Example
  ---------------------------------------------------------
 Total Carbon in Kgs 
                    GPU_1     Analog     Memory  Packaging
@@ -347,9 +224,6 @@ Total Carbon in Kgs
 (14, 14, 14)  272.730433  28.346999  25.408279   0.000000
  ---------------------------------------------------------
 ```
-
-
-
 
 
   [AMD-scaling]: <https://ieeexplore.ieee.org/document/9063103>
