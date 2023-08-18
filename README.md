@@ -130,7 +130,7 @@ The [packageC.json](./config/example/packageC.json) contains all the package rel
 ### Technology/scaling parameters 
 
 The [tech params directory!](./tech_params/.) holds the scaling factors along with other additional parameters such as CPA, defect density, area scaling, and dynamic_power scaling values  needed for computing CFP for a given chiplet type. 
-Analog, logic, and memory exhibit varying scaling rates [AMD-scaling] [Intel-Scaling]. Incorporating the transistor density scaling trends from [TSMC-scaling] [SRAM-scaling] allows us to address distinct scaling factors for different design types. By factoring in scaling trends in analog, memory and logic, ECO-CHIP computes CFP.
+Analog, logic, and memory exhibit varying scaling rates [[1]][AMD-scaling] [[2]][Intel-Scaling]. Incorporating the transistor density scaling trends from [[3]][TSMC-scaling] [[4]][SRAM-scaling] allows us to address distinct scaling factors for different design types. By factoring in scaling trends in analog, memory and logic, ECO-CHIP computes CFP.
 
 
 ## Running ECO-CHIP
