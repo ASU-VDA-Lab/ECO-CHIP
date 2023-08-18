@@ -145,6 +145,7 @@ python3 src/ECO_chip.py --design_dir config/example/
 
 To run one of the testcases :
 ```sh
+python3 src/ECO_chip.py --design_dir testcases/TigerLake/
 python3 src/ECO_chip.py --design_dir testcases/GA102/
 ```
 
