@@ -77,7 +77,7 @@ def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per
     if (np.all(np.array(techs) == techs[0]) and  not always_chiplets):
         yields = yield_calc((area*area_scale).sum(), defect_den.loc[techs[0],'defect_density'])
     else:
-        yields = np.zeros_like(techs,dtype=np.float)
+        yields = np.zeros_like(techs,dtype=float)
         for i, c in enumerate(techs):   
             yields[i] = yield_calc(areas[i]*area_scale[i], scaling_factors['defect_den'].loc[c,'defect_density'])
 #         print("yields:", yields)
@@ -127,7 +127,7 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
     if(~np.all(np.array(techs) == techs[0]) or always_chiplets):
         num_chiplets = len(areas)
         interposer_area, num_if = recursive_split(areas, emib_pitch=emib_pitch)
-        num_if = np.int(np.ceil(num_if))
+        num_if = int(np.ceil(num_if))
         interposer_area = np.prod(interposer_area) 
 #         print(interposer_area, np.sum(areas))
         interposer_carbon, _, _ = Si_chip([interposer_node], ["logic"], [interposer_area],scaling_factors,
