@@ -1,6 +1,7 @@
 import numpy as np
 import itertools as it
 from   matplotlib import pyplot as plt
+import math
 from tech_scaling import *
 
 ##############################################
@@ -58,9 +59,9 @@ def recursive_split(areas, axis=0, emib_pitch=10):
 
 ################################################
 #TODO : Remove comments 
+#wastage_add = will add extra si CFP wastage based on Formulae
 
-
-def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per_core=10,Carbon_per_kWh=700,packaging=False, always_chiplets=False):
+def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per_core=10,Carbon_per_kWh=700,packaging=False, always_chiplets=False,wastage_add = False,wafer_dia=450):
     area = np.array(areas)
     cpa =  np.array([scaling_factors['cpa'].loc[c, 'cpa'] for c in techs])
 #     delay =  np.array([scaling_factors[ty].loc[techs[i], 'delay'] for i, ty in enumerate(types)])
@@ -76,12 +77,25 @@ def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per
     
     if (np.all(np.array(techs) == techs[0]) and  not always_chiplets):
         yields = yield_calc((area*area_scale).sum(), defect_den.loc[techs[0],'defect_density'])
+        wastage_extra_cfp=0
+        if wastage_add:
+            wastage_extra_cfp = Si_wastage_accurate_t(wafer_dia=wafer_dia,chip_area=(area*area_scale).sum(),techs=techs,cpa_factors=scaling_factors['cpa'].loc[techs[0],'cpa'])
+            wastage_extra_cfp = (wastage_extra_cfp * area) / area.sum()
     else:
         yields = np.zeros_like(techs,dtype=float)
+        wastage_extra_cfp=np.zeros(len(techs))
         for i, c in enumerate(techs):   
             yields[i] = yield_calc(areas[i]*area_scale[i], scaling_factors['defect_den'].loc[c,'defect_density'])
 #         print("yields:", yields)
-    carbon = area_scale*cpa*area/yields
+            if wastage_add:
+                wastage_extra_cfp[i] = Si_wastage_accurate_t(wafer_dia=wafer_dia,chip_area=areas[i]*area_scale[i],techs=techs[i],cpa_factors=scaling_factors['cpa'].loc[techs[i],'cpa'])
+    
+    mfg_carbon = area_scale*cpa*area / yields
+    mfg_wst_carbon = mfg_carbon+wastage_extra_cfp
+    if wastage_add:
+        carbon = mfg_wst_carbon
+    else:
+        carbon = mfg_carbon
     return carbon, design_carbon, area_scale
 
 ###############################################
@@ -118,7 +132,7 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
     #4. 65 nm defect density, 
     #5. pacage defect density
     #6. 65nm carbon per area
-    #7. packaging yield adjustments  
+    #7. packaging yield adjustments
     package_carbon = 0 
     router_carbon = 0 
     router_design = 0
@@ -223,6 +237,19 @@ def package_CO2(design, scaling_factors, techs):
     
 #package_CO2(design, scaling_factors, [7, 10, 14])
 
+
+###############################################
+#Wastage calculation 
+
+def Si_wastage_accurate_t(wafer_dia,chip_area,techs,cpa_factors):
+    si_area = (math.pi * (wafer_dia ** 2))/4
+    dpw = math.pi * wafer_dia * ((wafer_dia/(4*chip_area)) - (1/math.sqrt(2*chip_area)))
+    area_wastage = si_area - (math.floor(dpw)*chip_area)
+    #unused_si_cfp = wastage_cfp(area_wastage,techs,scaling_factors)
+    unused_si_cfp = area_wastage*cpa_factors
+    wastage_si_cfp_pdie = unused_si_cfp/dpw
+    return wastage_si_cfp_pdie
+
 ###############################################
 #TODO : remove comments 
  
@@ -249,7 +276,7 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, p
     for n, comb in enumerate(combinations):
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
                                                                   areas=design.area.values,scaling_factors=scaling_factors, Transistors_per_gate=transistors_per_gate,
-                                                                  Power_per_core=power_per_core,Carbon_per_kWh=carbon_per_kWh, always_chiplets=always_chiplets )
+                                                                  Power_per_core=power_per_core,Carbon_per_kWh=carbon_per_kWh, always_chiplets=always_chiplets,wastage_add=True )
         package_c, router_c, design_carbon[n,-1], router_a =Interposer(areas=design.area.values*area_scale, techs=comb, types=design.type.values,scaling_factors=scaling_factors,
                                           package_type=package_type, always_chiplets=always_chiplets, interposer_node=interposer_node,
                                           tsv_pitch=tsv_pitch, tsv_size=tsv_size, RDLLayers=rdl_layer, EMIBLayers=emib_layers, emib_pitch=emib_pitch, numBEOL=num_beol, 
