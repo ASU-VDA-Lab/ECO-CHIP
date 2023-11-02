@@ -1,10 +1,13 @@
-# ECO-CHIP
+# ECO-CHIP : Estimation of Carbon Footprint of Chiplet-based Architectures for Sustainable VLSI
+[[paper](https://arxiv.org/pdf/2306.09434.pdf)]
 
 Carbon footprint estimator for heterogenous chiplet-based systems. 
 ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (design, manufacturing, and packaging). The tool supports the following HI and packaging architectures: RDL fanout, silicon bridge-based, passive and active interposer, and 3D integration. The tool evaluates the crucial package/assembly carbon emissions essential for HI systems, considering size, yield, and assembly process. In addition, it also estimates design CFP.  
 
 <img src="eco-chip-top.png" alt="drawing" width="600"/>
 
+## Abstract
+Decades of progress in energy-efficient and lowpower design have successfully reduced the operational carbon footprint in the semiconductor industry. However, this has led to increased embodied emissions, arising from design, manufacturing, and packaging. While existing research has developed tools to analyze embodied carbon for traditional monolithic systems, these tools do not apply to near-mainstream heterogeneous integration (HI) technologies. HI systems offer significant potential for sustainable computing by minimizing carbon emissions through two key strategies: “reducing” computation by “reusing” pre-designed chiplet IP blocks and adopting hierarchical approaches to system design. The reuse of  chiplets across multiple designs, even spanning multiple generations of ICs, can substantially reduce carbon emissions throughout the lifespan. This paper introduces ECO-CHIP, a carbon analysis tool designed to assess the potential of HI systems toward sustainable computing by considering scaling, chiplet, and packaging yields, design complexity, and even overheads associated with advanced packaging techniques. Experimental results from ECO-CHIP demonstrate that HI can reduce embodied carbon emissions by up to 30% compared to traditional monolithic systems. ECOCHIP is integrated with other chiplet simulators and is applied to chiplet disaggregation considering other metrics such as power, area, and cost. ECO-CHIP suggests that HI can pave the way for sustainable computing practices.
 
 ## Table of Contents
 
@@ -227,6 +230,21 @@ Total Carbon in Kgs
 (14, 14, 14)  272.730433  28.346999  25.408279   0.000000
  ---------------------------------------------------------
 
+```
+
+## Citation
+
+If you find ECO-CHIP useful or relavent to your research, please kindly cite our paper:
+
+```bibtex
+@misc{sudarshan2023ecochip,
+      title={ECO-CHIP: Estimation of Carbon Footprint of Chiplet-based Architectures for Sustainable VLSI}, 
+      author={Chetan Choppali Sudarshan and Nikhil Matkar and Sarma Vrudhula and Sachin S. Sapatnekar and Vidya A. Chhabria},
+      year={2023},
+      eprint={2306.09434},
+      archivePrefix={arXiv},
+      primaryClass={cs.AR}
+}
 ```
 
 
