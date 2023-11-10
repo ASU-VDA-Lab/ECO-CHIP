@@ -246,7 +246,8 @@ If you find ECO-CHIP useful or relavent to your research, please kindly cite our
       primaryClass={cs.AR}
 }
 ```
-
+## License
+BSD 3-Clause License. See [LICENSE](./LICENSE) file.
 
   [AMD-scaling]: <https://ieeexplore.ieee.org/document/9063103>
   [Intel-scaling]: <https://www.computer.org/csdl/proceedings-article/hcs/2022/09895532/1GZiGKCWYMw>
