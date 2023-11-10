@@ -88,7 +88,7 @@ git clone <path>
 cd ECO-CHIP
 python3 -m venv eco-chip
 source eco-chip/bin/activate
-pip3 install -r requirements.txt
+pip3 install -r --user requirements.txt
 ```
 
 ## Input definition and config
