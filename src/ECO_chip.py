@@ -108,7 +108,7 @@ result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake',
                        carbon_per_kWh=carbon_per_kWh,transistors_per_gate=transistors_per_gate,
                        power_per_core=power_per_core,interposer_node = interposer_node, rdl_layer=rdl_layer, emib_layers=emib_layers,
                        emib_pitch=emib_pitch, tsv_pitch=tsv_pitch, tsv_size=tsv_size, num_beol=numBEOL)
-print("Tiger Lake Example")
+print("'"+design_dir+"' Example testcase")
 print(" ---------------------------------------------------------")
 print("Manufacture Carbon in Kgs ")
 print(result[0]/1000) #Converting to Kgs
