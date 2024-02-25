@@ -232,6 +232,11 @@ Total Carbon in Kgs
  ---------------------------------------------------------
 
 ```
+With ECO-CHIP you can perform technology and chiplet space carbon exploration based on the architectural inputs to the framework. 
+
+<img src="tech-chiplet-sweep.png" alt="drawing" width="600"/>
+
+
 
 ## Artifact 
 
