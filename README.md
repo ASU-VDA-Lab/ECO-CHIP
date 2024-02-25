@@ -1,5 +1,5 @@
 # ECO-CHIP : Estimation of Carbon Footprint of Chiplet-based Architectures for Sustainable VLSI
-[[paper](https://arxiv.org/pdf/2306.09434.pdf)]
+[[paper](https://arxiv.org/pdf/2306.09434.pdf)] [[artifact](https://zenodo.org/records/10223759)]
 
 Carbon footprint estimator for heterogenous chiplet-based systems. 
 ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (design, manufacturing, and packaging). The tool supports the following HI and packaging architectures: RDL fanout, silicon bridge-based, passive and active interposer, and 3D integration. The tool evaluates the crucial package/assembly carbon emissions essential for HI systems, considering size, yield, and assembly process. In addition, it also estimates design CFP.  
@@ -16,6 +16,7 @@ Decades of progress in energy-efficient and lowpower design have successfully re
 -   [Config and input definition](#input-definition-and-config)
 -   [Running ECO-CHIP](#running-eco-chip)
 -   [Outputs](#outputs)
+-   [Artifact](#artifact)
 
 
 ## File structure
@@ -232,9 +233,15 @@ Total Carbon in Kgs
 
 ```
 
+## Artifact 
+
+This artifact is released on Zenodo and contains two parts. The first is [ECO-CHIP](https://github.com/ASU-VDA-Lab/ECO-CHIP) submodule from GitHub (current GitHub repository), and the second is a folder that consists of experiments performed using ECO-CHIP. The appendix section in the paper describes the installation of our artifact, ECO-CHIP, and the procedure to reproduce the results in the paper. 
+
+The artifact directory is available on [ECO-CHIP-Zenodo-Artifact-Link](https://zenodo.org/records/10223759) and has a detailed description of regenerating the results in the paper. 
+
 ## Citation
 
-If you find ECO-CHIP useful or relavent to your research, please kindly cite our paper:
+If you find ECO-CHIP useful or relevant to your research, please kindly cite our paper:
 
 ```bibtex
 @misc{sudarshan2023ecochip,
