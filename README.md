@@ -236,7 +236,9 @@ With ECO-CHIP you can perform technology and chiplet space carbon exploration ba
 
 <img src="tech-chiplet-sweep.png" alt="drawing" width="600"/>
 
+It also can take in multiple chiplets and shown below is the variation in total CFP for different chiplet (Nc) numbers for a test case. 
 
+<img src="nc-sweep.png" alt="drawing" width="600"/>
 
 ## Artifact 
 
