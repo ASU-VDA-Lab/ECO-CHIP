@@ -1,5 +1,5 @@
-# ECO-CHIP : Estimation of Carbon Footprint of Chiplet-based Architectures for Sustainable VLSI
-[[paper](https://arxiv.org/pdf/2306.09434.pdf)] [[artifact](https://zenodo.org/records/10223759)]
+# ECO-CHIP : Estimation of Carbon Footprint of Chiplet-based Architectures for Sustainable VLSI [[paper](https://arxiv.org/pdf/2306.09434.pdf)] [[artifact](https://zenodo.org/records/10223759)] [[Slides](./uploads/ECO-CHIP-Chetan-HPCA2024.pdf)] [[Poster](./uploads/ECO-CHIP-HPCA2024-Poster.pdf)]
+
 
 Carbon footprint estimator for heterogenous chiplet-based systems. 
 ECO-CHIP is an analysis tool that analyzes the operational and embodied CFP (design, manufacturing, and packaging). The tool supports the following HI and packaging architectures: RDL fanout, silicon bridge-based, passive and active interposer, and 3D integration. The tool evaluates the crucial package/assembly carbon emissions essential for HI systems, considering size, yield, and assembly process. In addition, it also estimates design CFP.  
