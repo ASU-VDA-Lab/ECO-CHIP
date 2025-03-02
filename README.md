@@ -25,7 +25,6 @@ Decades of progress in energy-efficient and lowpower design have successfully re
   - **example/**
     - [architecture.json](./config/example/architecture.json)
     - [designC.json](./config/example/designC.json)
-    - [node_list.txt](./config/example/node_list.txt)
     - [operationalC.json](./config/example/operationalC.json)
     - [packageC.json](./config/example/packageC.json)
 - [README.md](./README.md)
@@ -48,25 +47,21 @@ Decades of progress in energy-efficient and lowpower design have successfully re
   - **A15/**
     - [architecture.json](./testcases/A15/architecture.json)
     - [designC.json](./testcases/A15/designC.json)
-    - [node_list.txt](./testcases/A15/node_list.txt)
     - [operationalC.json](./testcases/A15/operationalC.json)
     - [packageC.json](./testcases/A15/packageC.json)
   - **EMR2/**
     - [architecture.json](./testcases/EMR2/architecture.json)
     - [designC.json](./testcases/EMR2/designC.json)
-    - [node_list.txt](./testcases/EMR2/node_list.txt)
     - [operationalC.json](./testcases/EMR2/operationalC.json)
     - [packageC.json](./testcases/EMR2/packageC.json)
   - **GA102/**
     - [architecture.json](./testcases/GA102/architecture.json)
     - [designC.json](./testcases/GA102/designC.json)
-    - [node_list.txt](./testcases/GA102/node_list.txt)
     - [operationalC.json](./testcases/GA102/operationalC.json)
     - [packageC.json](./testcases/GA102/packageC.json)
   - **TigerLake/**
     - [architecture.json](./testcases/TigerLake/architecture.json)
     - [designC.json](./testcases/TigerLake/designC.json)
-    - [node_list.txt](./testcases/TigerLake/node_list.txt)
     - [operationalC.json](./testcases/TigerLake/operationalC.json)
     - [packageC.json](./testcases/TigerLake/packageC.json)
 
@@ -98,21 +93,24 @@ ECO-CHIP has three inputs, including a design configuration file, a list of supp
 
 ### Architecture configuration
 
-The input system architecture is specified in [architecture.json](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL", "EMIB", "passive", "active" and "3D". The area of each chiplet is also specified in mm2, as shown below.  
+The input system architecture is specified in [architecture.json](config/example/architecture.json) file. The high-level details of each chiplet must be specified as shown below. In the example below, there are three chiplets named chiplet1, chiplet2, and chiplet3.  Each chiplet has its type, which currently includes one of three categories: logic, analog, or sram. The corresponding nodes to each of the chiplet need to be mentioned as shown below. ECO-CHIP currently supports the following nodes 7nm, 10nm, 14nm, 22nm, and 28nm. To select from five distinct pacakging architectures, the parameter 'pkg_type' can be used with "RDL", "EMIB", "passive", "active" and "3D". The area of each chiplet is also specified in mm2, as shown below.  
 
 ```
 {
 "chiplet1" : {
           "type" : "logic",
-          "area" : 16.04
+          "area" : 16.04,
+          "node" : 7
         },
 "chiplet2" : {
           "type" : "analog",
-          "area" : 24.47
+          "area" : 24.47,
+          "node" : 10
         },
 "chiplet3" : {
           "type" : "sram",
-          "area" : 10.84
+          "area" : 10.84,
+          "node" : 10
        },
 "pkg_type" : "RDL"
 }
@@ -121,10 +119,6 @@ The above file can be extended to support any number of chiplets by adding more 
 
 ### Design carbon parameters
 The [designC.json](./config/example/designC.json) includes parameters such as the number of design iterations, volume (indicating the number of manufactured parts), and the overall architecture power. Additionally, it encompasses parameters like transistors_per_gate, power_per_core which is the power consumed by the compute resources used for design, as well as carbon_per_kWh, indicating the carbon footprint per kWh from the source. The transistor per gate is used to calculate the number of logic gates in the design which is further used to evaluate design effort. 
-
-### Technology node list
-
-The [node_list.txt](./config/node_list.txt) file specifies the possible combination of nodes each chiplet can be implemented in. The current node_list.txt file contains [7,10,14] and ECO-CHIP generates the CFP for  all feasible combinations for 7nm, 10nm and 14nm, for all the chiplets specified in design.json. ECO-CHIP currently supports the following nodes 7nm, 10nm, 14nm, 22nm, and 28nm. 
 
 ### Operational carbon parameters
 In [operationalC.json](./config/example/operationalC.json) the lifetime value parameter is provided in hours as its unit of measurement. The current example file demonstrates a lifetime of 2 years (2*365*24 = 17520)
@@ -163,7 +157,6 @@ Example output for Tiger Lake test case with 7nm and 10nm nodes in node_list.txt
 Using below files for CFP estimations : 
 
 testcases/TigerLake/architecture.json
-testcases/TigerLake/node_list.txt
 testcases/TigerLake/designC.json
 testcases/TigerLake/operationalC.json
 testcases/TigerLake/packageC.json
@@ -171,16 +164,21 @@ testcases/TigerLake/packageC.json
  
 'testcases/TigerLake/' Example testcase
  ---------------------------------------------------------
+Manufacture Carbon in Kgs 
+                  CPU    Analog    Memory  Packaging
+(7, 10, 10)  0.443625  0.505251  0.218273   0.244415
+ ---------------------------------------------------------
+Design Carbon in Kgs 
+                 CPU    Analog    Memory  Packaging
+(7, 10, 10)  0.28708  0.204655  0.090661   0.005803
+ ---------------------------------------------------------
+Operational Carbon in Kgs 
+                  CPU    Analog    Memory  Packaging
+(7, 10, 10)  3.329402  4.637593  2.054414        0.0
+ ---------------------------------------------------------
 Total Carbon in Kgs 
-                   CPU    Analog    Memory  Packaging
-(7, 7, 7)     4.169723  6.361167  2.817943   0.000000
-(7, 7, 10)    4.123481  6.307968  2.394593   0.252043
-(7, 10, 7)    4.123481  5.419826  2.781703   0.249348
-(7, 10, 10)   4.123481  5.419826  2.394593   0.246365
-(10, 7, 7)    4.770286  6.307968  2.781703   0.319030
-(10, 7, 10)   4.770286  6.307968  2.394593   0.316047
-(10, 10, 7)   4.770286  5.419826  2.781703   0.313353
-(10, 10, 10)  4.798368  5.466991  2.421830   0.000000
+                  CPU    Analog    Memory  Packaging
+(7, 10, 10)  4.060106  5.347499  2.363347   0.250218
  ---------------------------------------------------------
 ```
 
@@ -192,7 +190,6 @@ Example output for GA102 testcase with 7nm,10nm and 14nm in the node_list.txt fi
 Using below files for CFP estimations : 
 
 testcases/GA102/architecture.json
-testcases/GA102/node_list.txt
 testcases/GA102/designC.json
 testcases/GA102/operationalC.json
 testcases/GA102/packageC.json
@@ -200,38 +197,24 @@ testcases/GA102/packageC.json
  
 'testcases/GA102/' Example testcase
  ---------------------------------------------------------
-Total Carbon in Kgs 
-                   GPU_1     Analog     Memory  Packaging
-(7, 7, 7)     166.492242  36.051578  23.026315   0.000000
-(7, 7, 10)    157.072901  30.858934  16.911125   2.845736
-(7, 7, 14)    157.072901  30.858934  19.615335   3.117421
-(7, 10, 7)    157.072901  26.586697  19.551602   2.842875
-(7, 10, 10)   157.072901  26.586697  16.911125   2.839708
-(7, 10, 14)   157.072901  26.586697  19.615335   3.111394
-(7, 14, 7)    157.072901  23.534043  19.551602   2.840229
-(7, 14, 10)   157.072901  23.534043  16.911125   2.837062
-(7, 14, 14)   157.072901  23.534043  19.615335   3.108748
-(10, 7, 7)    189.316945  30.858934  19.551602   5.102011
-(10, 7, 10)   189.316945  30.858934  16.911125   5.098844
-(10, 7, 14)   189.316945  30.858934  19.615335   5.497888
-(10, 10, 7)   189.316945  26.586697  19.551602   5.095984
-(10, 10, 10)  196.405500  30.756347  19.644226   0.000000
-(10, 10, 14)  189.316945  26.586697  19.615335   5.491861
-(10, 14, 7)   189.316945  23.534043  19.551602   5.093338
-(10, 14, 10)  189.316945  23.534043  16.911125   5.090171
-(10, 14, 14)  189.316945  23.534043  19.615335   5.489215
-(14, 7, 7)    280.104180  30.858934  19.551602   9.711567
-(14, 7, 10)   280.104180  30.858934  16.911125   9.708401
-(14, 7, 14)   280.104180  30.858934  19.615335  10.347061
-(14, 10, 7)   280.104180  26.586697  19.551602   9.705540
-(14, 10, 10)  280.104180  26.586697  16.911125   9.702373
-(14, 10, 14)  280.104180  26.586697  19.615335  10.341034
-(14, 14, 7)   280.104180  23.534043  19.551602   9.702894
-(14, 14, 10)  280.104180  23.534043  16.911125   9.699727
-(14, 14, 14)  298.871352  31.355502  27.894171   0.000000
+Manufacture Carbon in Kgs 
+                 GPU_1    Analog    Memory  Packaging
+(7, 10, 14)  26.787675  2.099898  2.216669   4.170742
  ---------------------------------------------------------
-
+Design Carbon in Kgs 
+                GPU_1    Analog    Memory  Packaging
+(7, 10, 14)  7.606727  0.769695  0.437029   0.005642
+ ---------------------------------------------------------
+Operational Carbon in Kgs 
+                  GPU_1     Analog     Memory  Packaging
+(7, 10, 14)  118.006498  23.330982  16.596411        0.0
+ ---------------------------------------------------------
+Total Carbon in Kgs 
+                GPU_1     Analog     Memory  Packaging
+(7, 10, 14)  152.4009  26.200575  19.250109   4.176384
+ ---------------------------------------------------------
 ```
+
 With ECO-CHIP you can perform technology and chiplet space carbon exploration based on the architectural inputs to the framework. 
 
 <img src="tech-chiplet-sweep.png" alt="drawing" width="600"/>
