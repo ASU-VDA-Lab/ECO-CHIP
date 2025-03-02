@@ -16,7 +16,6 @@ debug = False
 
 
 scaling_factors = load_tables()
-#print(scaling_factors)
 
 
 parser = argparse.ArgumentParser(description='Provide a Carbon Foot Print(CFP) estimate ')
@@ -31,14 +30,14 @@ args = parser.parse_args()
 design_dir = args.design_dir
     
 architecture_file = design_dir+'architecture.json'
-node_list_file = design_dir+'node_list.txt'
+#node_list_file = design_dir+'node_list.txt'
 designC_file = design_dir+'designC.json'
 operationalC_file = design_dir+'operationalC.json'
 packageC_file = design_dir+'packageC.json'
 print(" ---------------------------------------------------------")
 print("Using below files for CFP estimations : \n")
 print(architecture_file)
-print(node_list_file)
+#print(node_list_file)
 print(designC_file)
 print(operationalC_file)
 print(packageC_file)
@@ -48,29 +47,18 @@ print(" ---------------------------------------------------------")
 with open(architecture_file,'r') as json_file:
     config_json = json.load(json_file)
 
-with open(node_list_file , 'r') as file:
-    nodes=file.readlines()
-nodes = [ast.literal_eval(node_item) for node_item in nodes]
-nodes = [data for inside_node in nodes for data in inside_node]
-#print("Nodes from node_list.txt file ",nodes) if debug else None
+#Removed this, as nodes are coming from architecture.json 
+#with open(node_list_file , 'r') as file:
+#    nodes=file.readlines()
+#nodes = [ast.literal_eval(node_item) for node_item in nodes]
+#nodes = [data for inside_node in nodes for data in inside_node]
 
-#print(config_json)
-#print(type(config_json))
-#print("start") #TODO CCS remove
 design = pd.DataFrame(config_json).T
-#print(type(design))
-#print(design) if debug else None
-#print("done")   #TODO CCS remove
 package_type = design.loc['pkg_type']
 package_type = package_type[0]
     
 design = design.drop(index='pkg_type')
-#print(design)
 
-#power = 450
-#powers = design.area.values * power / design.area.values.sum()
-#design.insert(loc=2,column='power',value=powers)
-#print(design)
 
 with open(designC_file, 'r') as f:
     designC_values = json.load(f)
@@ -83,7 +71,6 @@ power_per_core = designC_values['Power_per_core']
 carbon_per_kWh = designC_values['Carbon_per_kWh']
 
 design.insert(loc=2,column='power',value=powers)
-#print(design)
 print(" ")
 
 with open(operationalC_file,'r') as f:
@@ -102,8 +89,6 @@ tsv_size = packageC_values['tsv_size']
 numBEOL = packageC_values['num_beol']
 
     
-#result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
-#C result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake',
 result = calculate_CO2(design,scaling_factors, 'Tiger Lake',
                        num_iter,package_type=package_type ,Ns=num_prt_mfg,lifetime=lifetime,
                        carbon_per_kWh=carbon_per_kWh,transistors_per_gate=transistors_per_gate,

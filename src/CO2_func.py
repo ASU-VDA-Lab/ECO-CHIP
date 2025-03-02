@@ -10,12 +10,9 @@ debug = False
 #Yeild Calculation 
 def yield_calc(area, defect_density):
     yield_val = (1+(defect_density*1e4)*(area*1e-6)/10)**-10
-    #print(f"Yield is {yield_val} for area {area}") if debug else None
     return yield_val
 
 ###############################################
-#TODO remove old commented codes
-#TODO where does the below 3 constants go?
 
 #Trasistors_per_gate = 8 
 #Power_per_core = 10
@@ -31,7 +28,6 @@ def design_costs(areas, comb,scaling_factors,Transistors_per_gate,Power_per_core
 
 
 ################################################
-#TODO : Remove unwanted prints and others
 
 
 def recursive_split(areas, axis=0, emib_pitch=10):
@@ -61,7 +57,6 @@ def recursive_split(areas, axis=0, emib_pitch=10):
 
 
 ################################################
-#TODO : Remove comments 
 #wastage_add = will add extra si CFP wastage based on Formulae
 
 def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per_core=10,Carbon_per_kWh=700,packaging=False, always_chiplets=False,wastage_add = False,wafer_dia=450):
@@ -72,23 +67,19 @@ def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per
         area_scale = np.array([scaling_factors[ty].loc[techs[i], 'area'] for i, ty in enumerate(types)])
         design_carbon = design_costs(areas*area_scale, techs,scaling_factors,Transistors_per_gate,Power_per_core,Carbon_per_kWh)
         defect_den = scaling_factors['defect_den']
-        #print("CHIPS") if debug else None
     else:
         design_carbon = 0
         defect_den = scaling_factors['defect_den']/4 # packaing has lower density 
         #Cost-effective design of scalable high-performance systems using active and passive interposers
         area_scale = np.ones_like(area)
-        #print("PACKAGING") if debug else None
     
     if (np.all(np.array(techs) == techs[0]) and  not always_chiplets):
-        #print(f"MONOLITHIC with techs {techs}") if debug else None
         yields = yield_calc((area*area_scale).sum(), defect_den.loc[techs[0],'defect_density'])
         wastage_extra_cfp=0
         if wastage_add:
             wastage_extra_cfp = Si_wastage_accurate_t(wafer_dia=wafer_dia,chip_area=(area*area_scale).sum(),techs=techs,cpa_factors=scaling_factors['cpa'].loc[techs[0],'cpa'])
             wastage_extra_cfp = (wastage_extra_cfp * area) / area.sum()
     else:
-        #print(f"CHIPLET with techs {techs}") if debug else None
         yields = np.zeros_like(techs,dtype=float)
         wastage_extra_cfp=np.zeros(len(techs))
         for i, c in enumerate(techs):   
@@ -106,7 +97,6 @@ def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per
     return carbon, design_carbon, area_scale
 
 ###############################################
-#TODO 
 
 def power_chip(techs, types, scaling_factors,powers, lifetime, activity,Carbon_per_kWh):
     active = activity[0]
@@ -122,7 +112,6 @@ def power_chip(techs, types, scaling_factors,powers, lifetime, activity,Carbon_p
     return op_carbon,powers_scaled 
 
 ###############################################
-#TODO : Remove comments 
 
 
 
@@ -206,7 +195,6 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
 
 
 ###############################################
-#TODO : Remove comments 
 
 def plot_packaging_carbon(carbon,labels):
     carbon.plot(kind='bar', stacked=False, figsize = (21,7),
@@ -242,7 +230,6 @@ def package_CO2(design, scaling_factors, techs):
     plot_packaging_carbon(carbon,labels)
 #     plt.xlim([-1, 1])
     
-#package_CO2(design, scaling_factors, [7, 10, 14])
 
 
 ###############################################
@@ -270,10 +257,7 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, p
                  ):
     #num_iter = 90
     
-    #C if in_combinations is None:
-    #C     combinations = list(it.product(techs, repeat=len(design.index)))
-    #C else:
-    #C     combinations = in_combinations
+    #Chiplet configuration based on nodes from architecture.json
     combinations = design.node.values
     combinations = [tuple(combinations)] 
     
@@ -291,8 +275,6 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, p
 
     
     for n, comb in enumerate(combinations):
-        print("######################### ") if debug else None
-        print(f"Running combination {comb} with number {n}") if debug else None
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
                                                                   areas=design.area.values,scaling_factors=scaling_factors, Transistors_per_gate=transistors_per_gate,
                                                                   Power_per_core=power_per_core,Carbon_per_kWh=carbon_per_kWh, always_chiplets=always_chiplets,wastage_add=True )
