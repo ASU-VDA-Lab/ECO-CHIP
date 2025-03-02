@@ -1,15 +1,18 @@
 {
 "GPU_1" : {
           "type" : "logic",
-          "area" : 425.01
+          "area" : 425.01,
+          "node" : 7
         },
 "Analog" : {
           "type" : "analog",
-          "area" : 92.03
+          "area" : 92.03,
+          "node" : 10
         },
 "Memory" : {
           "type" : "sram",
-          "area" : 58.78
+          "area" : 58.78,
+          "node" : 14
        },
 "pkg_type" : "RDL"
 }

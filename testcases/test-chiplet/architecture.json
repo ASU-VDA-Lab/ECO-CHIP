@@ -1,0 +1,13 @@
+{
+"CPU1" : {
+          "type" : "logic",
+          "area" : 74,
+          "node" : 7
+        },
+"CPU2" : {
+          "type" : "logic",
+          "area" : 74,
+          "node" : 7
+        },
+"pkg_type" : "RDL"
+}

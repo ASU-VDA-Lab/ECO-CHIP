@@ -1,15 +1,18 @@
 {
 "CPU" : {
           "type" : "logic",
-          "area" : 16.04
+          "area" : 16.04,
+          "node" : 7
         },
 "Analog" : {
           "type" : "analog",
-          "area" : 24.47
+          "area" : 24.47,
+          "node" : 10
         },
 "Memory" : {
           "type" : "sram",
-          "area" : 10.84
+          "area" : 10.84,
+          "node" : 10
        },
 "pkg_type" : "RDL"
 }

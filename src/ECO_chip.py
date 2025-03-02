@@ -12,7 +12,7 @@ import argparse
 import json
 import ast
 
-
+debug = False
 
 
 scaling_factors = load_tables()
@@ -52,14 +52,14 @@ with open(node_list_file , 'r') as file:
     nodes=file.readlines()
 nodes = [ast.literal_eval(node_item) for node_item in nodes]
 nodes = [data for inside_node in nodes for data in inside_node]
-#print("Nodes from node_list.txt file ",nodes)
+#print("Nodes from node_list.txt file ",nodes) if debug else None
 
 #print(config_json)
 #print(type(config_json))
 #print("start") #TODO CCS remove
 design = pd.DataFrame(config_json).T
 #print(type(design))
-#print(design)
+#print(design) if debug else None
 #print("done")   #TODO CCS remove
 package_type = design.loc['pkg_type']
 package_type = package_type[0]
@@ -85,7 +85,7 @@ carbon_per_kWh = designC_values['Carbon_per_kWh']
 design.insert(loc=2,column='power',value=powers)
 #print(design)
 print(" ")
-    
+
 with open(operationalC_file,'r') as f:
     operationalC_values = json.load(f)
 lifetime = operationalC_values['lifetime']
@@ -100,10 +100,11 @@ emib_pitch = packageC_values['emib_pitch']
 tsv_pitch = packageC_values['tsv_pitch']
 tsv_size = packageC_values['tsv_size']
 numBEOL = packageC_values['num_beol']
-    
 
+    
 #result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake')
-result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake',
+#C result = calculate_CO2(design,scaling_factors, nodes, 'Tiger Lake',
+result = calculate_CO2(design,scaling_factors, 'Tiger Lake',
                        num_iter,package_type=package_type ,Ns=num_prt_mfg,lifetime=lifetime,
                        carbon_per_kWh=carbon_per_kWh,transistors_per_gate=transistors_per_gate,
                        power_per_core=power_per_core,interposer_node = interposer_node, rdl_layer=rdl_layer, emib_layers=emib_layers,

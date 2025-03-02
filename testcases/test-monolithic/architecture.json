@@ -1,0 +1,8 @@
+{
+"CPU" : {
+          "type" : "logic",
+          "area" : 148,
+          "node" : 7
+        },
+"pkg_type" : "RDL"
+}
