@@ -1,11 +1,13 @@
 {
 "CPU_0" : {
           "type" : "logic",
-          "area" : 595.95
+          "area" : 595.95,
+          "node" : 10
         },
 "CPU_1" : {
           "type" : "logic",
-          "area" : 595.95
+          "area" : 595.95,
+          "node" : 10
         },
 "pkg_type" : "RDL"
 }

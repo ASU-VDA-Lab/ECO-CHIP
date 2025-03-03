@@ -4,6 +4,8 @@ from   matplotlib import pyplot as plt
 import math
 from tech_scaling import *
 
+debug = False
+
 ##############################################
 #Yeild Calculation 
 def yield_calc(area, defect_density):
@@ -11,8 +13,6 @@ def yield_calc(area, defect_density):
     return yield_val
 
 ###############################################
-#TODO remove old commented codes
-#TODO where does the below 3 constants go?
 
 #Trasistors_per_gate = 8 
 #Power_per_core = 10
@@ -28,7 +28,6 @@ def design_costs(areas, comb,scaling_factors,Transistors_per_gate,Power_per_core
 
 
 ################################################
-#TODO : Remove unwanted prints and others
 
 
 def recursive_split(areas, axis=0, emib_pitch=10):
@@ -58,7 +57,6 @@ def recursive_split(areas, axis=0, emib_pitch=10):
 
 
 ################################################
-#TODO : Remove comments 
 #wastage_add = will add extra si CFP wastage based on Formulae
 
 def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per_core=10,Carbon_per_kWh=700,packaging=False, always_chiplets=False,wastage_add = False,wafer_dia=450):
@@ -99,7 +97,6 @@ def Si_chip(techs, types, areas,scaling_factors,Transistors_per_gate=8,Power_per
     return carbon, design_carbon, area_scale
 
 ###############################################
-#TODO 
 
 def power_chip(techs, types, scaling_factors,powers, lifetime, activity,Carbon_per_kWh):
     active = activity[0]
@@ -115,7 +112,6 @@ def power_chip(techs, types, scaling_factors,powers, lifetime, activity,Carbon_p
     return op_carbon,powers_scaled 
 
 ###############################################
-#TODO : Remove comments 
 
 
 
@@ -199,7 +195,6 @@ def Interposer(areas, techs, types, scaling_factors, package_type="passive", alw
 
 
 ###############################################
-#TODO : Remove comments 
 
 def plot_packaging_carbon(carbon,labels):
     carbon.plot(kind='bar', stacked=False, figsize = (21,7),
@@ -235,7 +230,6 @@ def package_CO2(design, scaling_factors, techs):
     plot_packaging_carbon(carbon,labels)
 #     plt.xlim([-1, 1])
     
-#package_CO2(design, scaling_factors, [7, 10, 14])
 
 
 ###############################################
@@ -263,16 +257,23 @@ def calculate_CO2(design, scaling_factors, techs, design_name='', num_iter=90, p
                  ):
     #num_iter = 90
     
-    if in_combinations is None:
-        combinations = list(it.product(techs, repeat=len(design.index)))
+    #Chiplet configuration based on nodes from architecture.json
+    combinations = design.node.values
+    combinations = [tuple(combinations)] 
+    
+    if len(design.index) == 1: #Monolithic
+        always_chiplets = False
     else:
-        combinations = in_combinations
+        always_chiplets = True
+    
     design_carbon = np.zeros((len(combinations), len(design.index)+1))
     op_carbon = np.zeros((len(combinations), len(design.index)+1))
     carbon = np.zeros((len(combinations), len(design.index)+1))
     
     areas=  np.zeros((len(combinations), len(design.index)))
     powers =  np.zeros((len(combinations), len(design.index)))
+
+    
     for n, comb in enumerate(combinations):
         carbon[n,:-1], design_carbon[n,:-1], area_scale = Si_chip(techs=comb, types=design.type.values,
                                                                   areas=design.area.values,scaling_factors=scaling_factors, Transistors_per_gate=transistors_per_gate,
